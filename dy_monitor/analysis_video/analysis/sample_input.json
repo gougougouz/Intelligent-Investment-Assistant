@@ -1,0 +1,44 @@
+[
+  {
+    "video_id": "video_001",
+    "base64_str": "QUJDREVGR0g=",
+    "target_stock_or_sector": "机器人行业股票",
+    "fan_count": 1580000,
+    "like_count": 1290,
+    "auth_type": "垂类财经博主",
+    "hist_acc": 0.86,
+    "top_comments": [
+      {
+        "comment_id": "cmt_001_01",
+        "content": "机器人行业订单增速不错，龙头估值还在合理区间，我偏支持继续跟踪。",
+        "like_count": 320
+      },
+      {
+        "comment_id": "cmt_001_02",
+        "content": "短期涨幅有点大，担心业绩兑现不及预期，先谨慎一点。",
+        "like_count": 180
+      }
+    ]
+  },
+  {
+    "video_id": "video_002",
+    "base64_str": "SElKS0xNTk8=",
+    "target_stock_or_sector": "机器人行业股票",
+    "fan_count": 1260000,
+    "like_count": 2480,
+    "auth_type": "券商认证",
+    "hist_acc": 0.93,
+    "top_comments": [
+      {
+        "comment_id": "cmt_002_01",
+        "content": "政策支持叠加产业升级，机器人板块中期趋势我认为偏多。",
+        "like_count": 460
+      },
+      {
+        "comment_id": "cmt_002_02",
+        "content": "海外需求波动和竞争加剧也要看到，别只看利好。",
+        "like_count": 210
+      }
+    ]
+  }
+]

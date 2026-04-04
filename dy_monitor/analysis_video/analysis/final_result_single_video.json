@@ -1,0 +1,35 @@
+{
+  "target_stock_or_sector": "机器人行业股票",
+  "input_video_count": 1,
+  "high_logic_video_count": 1,
+  "sum_weighted_sentiment": 0.198311,
+  "consensus_c": 0.0,
+  "consensus_sentiment": 0.198311,
+  "total_support_score": 0.072,
+  "total_oppose_score": 0.0,
+  "total_valid_comment_count": 1,
+  "comment_adjust_factor": 0.072,
+  "initial_score": 0.212589,
+  "final_score": 45.9,
+  "sentiment_level": "中性",
+  "investment_advice": "持有/观望",
+  "explain_report": "共纳入1条高逻辑质量视频，平均逻辑评分L=0.53；高逻辑视频加权情绪和=0.1983，观点共识度C=0.00，评论修正因子=0.0720。贡献最显著的视频为video_id=video_local_001，其单视频情绪分S_v=0.1983。",
+  "high_logic_video_details": [
+    {
+      "video_id": "video_local_001",
+      "full_text": "机器人，要不要跑？ 3月10日13:50 只作学习交流 不作投资建议 领跑全球 机器人趋势继续 到现在已经五个点了啊 虽然整体大盘不会大涨 但是机器人已经跌的太多了 只要局势稳定 资金就会逐步回流 可以躺着不动了 会有很多的机器人 利好催化出来 特斯拉v三原型机 将在三月底亮相 是首个通用人性机器人 银河通用呢 完成了二十五亿的巨额融资 加速产业化的落地 同时艾斯顿在三月十号 将在港交所上市 有机构预测啊 全球智能机器人硬件 将超过三百亿美刀 中国占三分之一 领跑全球",
+      "logic_quality_L": 0.53,
+      "fan_norm": 0.79,
+      "like_norm": 0.43,
+      "base_influence": 1.22,
+      "W_b": 0.556076,
+      "raw_sentiment": 0.356625,
+      "S_v": 0.19831060350000002,
+      "text_sentiment": 0.68,
+      "text_certainty": 0.75,
+      "audio_sentiment_correction": 0.21,
+      "visual_sentiment_correction": 0.1,
+      "finance_credibility_bonus": 0.0
+    }
+  ]
+}

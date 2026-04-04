@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Downloaded videos
+analysis_video/video_downloads/
+
+# Storage files
+analysis_video/config/storage/*.json
+
+# Logs
+analysis_video/logs/
