@@ -12,7 +12,11 @@ import requests
 from .providers.douyin import fetch_recent_videos_for_creators
 from .accounts.user_service import UserService
 from .accounts.billing_service import BillingService
-from .analysis.csv_analyzer import analyze_pending_videos_in_csv
+from .analysis.csv_analyzer import (
+    analyze_pending_videos_in_csv,
+    build_investment_report,
+    format_investment_report_text,
+)
 from .notifications.email_service import send_email_to_recipient
 
 logger = get_logger("scheduler")
@@ -42,19 +46,16 @@ def _next_day_is_trading() -> bool:
     return tomorrow.weekday() <= 4
 
 
-def job(config: AppConfig) -> None:
-    """执行一次完整任务：抓取视频、分析视频、向用户发送邮件并记账扣费。"""
-    logger.info("Job started.") 
+def job(config: AppConfig) -> dict:
+    """执行一次任务：抓取视频、分析视频，并按配置可选发送邮件与记账。"""
+    logger.info("Job started.")
     run_start = datetime.now()
     base = os.path.abspath(os.path.join(os.path.dirname(__file__), "config", "storage"))
     os.makedirs(base, exist_ok=True)
-    store_path = os.path.join(base, "users.json")
-    billing_path = os.path.join(base, "billing.json")
-    user_service = UserService(store_path)
-    billing = BillingService(billing_path)
+    analysis_report = build_investment_report([], scope_name="本次新增视频")
+
     try:
         fetch_recent_videos_for_creators(config)
-        analyze_pending_videos_in_csv(config)
     except requests.exceptions.HTTPError as e:
         resp = getattr(e, "response", None)
         status = getattr(resp, "status_code", None)
@@ -63,9 +64,30 @@ def job(config: AppConfig) -> None:
             body = resp.text
         except Exception:
             body = ""
-        logger.error(f"HTTPError status={status} url={url} body={body[:500]}")
+        logger.error(f"Fetch HTTPError status={status} url={url} body={body[:500]}")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Fetch error: {e}")
+
+    try:
+        analysis_report = analyze_pending_videos_in_csv(config, only_after=run_start)
+        logger.info(
+            "Investment report ready "
+            f"score={analysis_report.get('final_score')} "
+            f"advice={analysis_report.get('investment_advice')} "
+            f"path={analysis_report.get('report_path', '')}"
+        )
+    except Exception as e:
+        logger.error(f"Analyze error: {e}")
+
+    if not bool(getattr(config, "dispatch_email_in_job", False)):
+        logger.info("Email dispatch disabled in job; skip notification and billing flow.")
+        logger.info("Job finished.")
+        return analysis_report
+
+    store_path = os.path.join(base, "users.json")
+    billing_path = os.path.join(base, "billing.json")
+    user_service = UserService(store_path)
+    billing = BillingService(billing_path)
 
     creators_path = os.path.join(base, "creators.json")
     sec_to_safe: dict[str, str] = {}
@@ -82,13 +104,19 @@ def job(config: AppConfig) -> None:
         pass
 
     videos_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "storage", "videos"))
-    for u in user_service.list_users():
+    users = user_service.list_users()
+    active_users = [u for u in users if u.active]
+    if not active_users:
+        logger.info("No active users found; skip email dispatch.")
+
+    for u in active_users:
         if not u.active:
             continue
         follows = user_service.list_follows(u.phone)
         creator_ids = {f.creator_id for f in follows}
         conclusions = []
         total_llm_cents = 0
+        user_video_rows = []
         for cid in creator_ids:
             safe = sec_to_safe.get(cid, cid)
             fpath = os.path.join(videos_dir, f"{safe}.csv")
@@ -113,6 +141,10 @@ def job(config: AppConfig) -> None:
                 if ts_obj <= run_start:
                     continue
                 aweme_id = (row[0] or "").strip()
+                create_time = (row[1] or "").strip() if len(row) > 1 else ""
+                digg_count = (row[2] or "0").strip() if len(row) > 2 else "0"
+                comment_count = (row[3] or "0").strip() if len(row) > 3 else "0"
+                collect_count = (row[4] or "0").strip() if len(row) > 4 else "0"
                 text = row[6]
                 try:
                     llm_cents = int((row[7] or "0").strip())
@@ -121,9 +153,29 @@ def job(config: AppConfig) -> None:
                 multiplier = int(getattr(config, "llm_cost_multiplier", 2) or 2)
                 per_fee = (llm_cents or 0) * multiplier
                 conclusions.append({"summary": f"{aweme_id}", "details": {"analysis": text, "fee_cents": per_fee}})
+                user_video_rows.append(
+                    {
+                        "aweme_id": aweme_id,
+                        "create_time": create_time,
+                        "digg_count": digg_count,
+                        "comment_count": comment_count,
+                        "collect_count": collect_count,
+                        "analysis_text": text,
+                        "creator": safe,
+                    }
+                )
                 total_llm_cents += llm_cents
                 billing.record(u.id, "llm.analyze", llm_cents or 1, {"aweme_id": aweme_id})
         if conclusions:
+            user_report = build_investment_report(user_video_rows, scope_name="本次新增视频")
+            advice_text = format_investment_report_text(user_report)
+            conclusions.insert(
+                0,
+                {
+                    "summary": "投资建议",
+                    "details": {"analysis": advice_text, "fee_cents": 0},
+                },
+            )
             send_email_to_recipient(conclusions, u.email, config)
             cfg_email = EmailConfig()
             email_cents = int(round(float(getattr(cfg_email, "email_cost_yuan", 0) or 0) * 100))
@@ -132,6 +184,7 @@ def job(config: AppConfig) -> None:
                 user_service.adjust_balance(u.id, -total_cost_cents)
                 billing.record(u.id, "charge.balance", total_cost_cents, {"llm_total_cents": str(total_llm_cents)})
     logger.info("Job finished.")
+    return analysis_report
 
 
 def start_scheduler() -> None:

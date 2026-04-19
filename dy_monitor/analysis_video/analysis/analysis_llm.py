@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import base64
 import json
@@ -5,40 +7,71 @@ import time
 from itertools import combinations
 from typing import Any, Dict, List, Tuple
 
-import numpy as np
-import pandas as pd
+try:
+    import numpy as np
+except Exception:  # noqa: BLE001
+    np = None  # type: ignore[assignment]
 
-from config import (
-    ALLOWED_AUTH_TYPES,
-    API_RETRY_INTERVAL_SEC,
-    API_RETRY_TIMES,
-    ARK_API_KEY,
-    ARK_BASE_URL,
-    COMMENT_LIKE_MAX,
-    COMMENT_PROMPT,
-    EMBEDDING_MODEL_ID,
-    FAN_COUNT_MAX,
-    HIST_MAX,
-    HIST_MIN,
-    LOGIC_PROMPT,
-    LOGIC_QUALITY_THRESHOLD,
-    MULTIMODAL_PROMPT,
-    RAW_SENTIMENT_WEIGHT_AUDIO,
-    RAW_SENTIMENT_WEIGHT_TEXT,
-    RAW_SENTIMENT_WEIGHT_VISUAL,
-    SENTIMENT_LEVEL_MAPPING,
-    TARGET_STOCK_OR_SECTOR,
-    TEXT_MODEL_ID,
-    VIDEO_LIKE_MAX,
-    VISION_MODEL_ID,
-)
+try:
+    import pandas as pd
+except Exception:  # noqa: BLE001
+    pd = None  # type: ignore[assignment]
+
+try:
+    from .config import (
+        ALLOWED_AUTH_TYPES,
+        API_RETRY_INTERVAL_SEC,
+        API_RETRY_TIMES,
+        ARK_API_KEY,
+        ARK_BASE_URL,
+        COMMENT_LIKE_MAX,
+        COMMENT_PROMPT,
+        EMBEDDING_MODEL_ID,
+        FAN_COUNT_MAX,
+        HIST_MAX,
+        HIST_MIN,
+        LOGIC_PROMPT,
+        LOGIC_QUALITY_THRESHOLD,
+        MULTIMODAL_PROMPT,
+        RAW_SENTIMENT_WEIGHT_AUDIO,
+        RAW_SENTIMENT_WEIGHT_TEXT,
+        RAW_SENTIMENT_WEIGHT_VISUAL,
+        SENTIMENT_LEVEL_MAPPING,
+        TARGET_STOCK_OR_SECTOR,
+        TEXT_MODEL_ID,
+        VIDEO_LIKE_MAX,
+        VISION_MODEL_ID,
+    )
+except ImportError:
+    from config import (
+        ALLOWED_AUTH_TYPES,
+        API_RETRY_INTERVAL_SEC,
+        API_RETRY_TIMES,
+        ARK_API_KEY,
+        ARK_BASE_URL,
+        COMMENT_LIKE_MAX,
+        COMMENT_PROMPT,
+        EMBEDDING_MODEL_ID,
+        FAN_COUNT_MAX,
+        HIST_MAX,
+        HIST_MIN,
+        LOGIC_PROMPT,
+        LOGIC_QUALITY_THRESHOLD,
+        MULTIMODAL_PROMPT,
+        RAW_SENTIMENT_WEIGHT_AUDIO,
+        RAW_SENTIMENT_WEIGHT_TEXT,
+        RAW_SENTIMENT_WEIGHT_VISUAL,
+        SENTIMENT_LEVEL_MAPPING,
+        TARGET_STOCK_OR_SECTOR,
+        TEXT_MODEL_ID,
+        VIDEO_LIKE_MAX,
+        VISION_MODEL_ID,
+    )
 
 try:
     from volcenginesdkarkruntime import Ark
-except ImportError as import_error:
-    raise ImportError(
-        "未安装火山引擎 Ark SDK，请先安装 requirements.txt 依赖。"
-    ) from import_error
+except ImportError:
+    Ark = None  # type: ignore[assignment]
 
 
 def to_float(value: Any, field_name: str) -> float:
@@ -116,10 +149,11 @@ class ArkService:
     """
 
     def __init__(self) -> None:
+        if Ark is None:
+            raise ImportError("未安装火山引擎 Ark SDK，请先安装 analysis/requirements.txt 依赖。")
         if not ARK_API_KEY:
             raise ValueError("ARK_API_KEY 未配置，请在 config.py 中填写后重试。")
         self.client = Ark(api_key=ARK_API_KEY, base_url=ARK_BASE_URL)
-
     def analyze_video_multimodal(self, base64_str: str) -> Dict[str, Any]:
         """
         调用多模态模型，直接传入 base64 视频字符串提取固定字段。
@@ -209,7 +243,7 @@ class ArkService:
 
         return call_with_retry(_do_call)
 
-    def get_embedding(self, text: str) -> np.ndarray:
+    def get_embedding(self, text: str) -> Any:
         """
         调用 Embedding 模型生成向量。
 
@@ -250,7 +284,9 @@ class ArkService:
 
             raise ValueError("Embedding 响应中未找到向量字段 embedding")
 
-        def _do_call() -> np.ndarray:
+        def _do_call() -> Any:
+            if np is None:
+                raise ImportError("未安装 numpy，无法执行 embedding 向量计算。")
             try:
                 response = self.client.embeddings.create(
                     model=EMBEDDING_MODEL_ID,
@@ -276,6 +312,89 @@ class ArkService:
             return np.array(vector, dtype=float)
 
         return call_with_retry(_do_call)
+
+
+def analyze_single_video(
+    ark_service: ArkService,
+    base64_str: str,
+    top_comments: List[Dict[str, Any]],
+    fan_count: float,
+    like_count: float,
+    auth_type: str = "普通用户",
+    hist_acc: float = 1.0,
+) -> Dict[str, Any]:
+    """复用 analysis_llm 的单视频核心算法，返回可直接落库的结果。"""
+    if auth_type not in ALLOWED_AUTH_TYPES:
+        auth_type = "普通用户"
+
+    multi = ark_service.analyze_video_multimodal(base64_str)
+    full_text = str(multi.get("full_text", "")).strip()
+
+    text_sentiment = to_float(multi.get("text_sentiment", 0.0), "text_sentiment")
+    text_certainty = to_float(multi.get("text_certainty", 0.0), "text_certainty")
+    audio_correction = to_float(
+        multi.get("audio_sentiment_correction", 0.0),
+        "audio_sentiment_correction",
+    )
+    visual_correction = to_float(
+        multi.get("visual_sentiment_correction", 0.0),
+        "visual_sentiment_correction",
+    )
+    finance_bonus = to_float(
+        multi.get("finance_credibility_bonus", 0.0),
+        "finance_credibility_bonus",
+    )
+
+    logic_resp = ark_service.score_logic_quality(full_text)
+    logic_quality_l = to_float(logic_resp.get("logic_quality_L", 0.0), "logic_quality_L")
+
+    support_score, oppose_score, valid_comment_count = process_comments(ark_service, top_comments)
+    net_argument_sentiment = support_score - oppose_score
+    if valid_comment_count <= 0:
+        comment_adjust_factor = 0.0
+    else:
+        comment_adjust_factor = net_argument_sentiment / valid_comment_count
+
+    fan_norm = max(0.0, min(1.0, to_float(fan_count, "fan_count") / FAN_COUNT_MAX))
+    like_norm = max(0.0, min(1.0, to_float(like_count, "like_count") / VIDEO_LIKE_MAX))
+    base_influence = fan_norm + like_norm
+
+    weight_b = base_influence * max(0.0, logic_quality_l) * max(0.0, to_float(hist_acc, "hist_acc"))
+    raw_sentiment = (
+        RAW_SENTIMENT_WEIGHT_TEXT * text_sentiment
+        + RAW_SENTIMENT_WEIGHT_AUDIO * audio_correction
+        + RAW_SENTIMENT_WEIGHT_VISUAL * visual_correction
+    )
+    raw_sentiment = raw_sentiment * (1 + finance_bonus) * text_certainty
+    s_v = weight_b * raw_sentiment
+
+    # 单视频场景下将评论修正直接作用在该视频分值上。
+    initial_score = s_v * (1 + comment_adjust_factor)
+    final_score = ((initial_score - HIST_MIN) / (HIST_MAX - HIST_MIN)) * 100
+    final_score = max(0.0, min(100.0, final_score))
+    final_score = round(final_score, 1)
+    sentiment_level, investment_advice = map_score_to_level_and_advice(final_score)
+
+    text_brief = (full_text or "").replace("\n", " ").strip()
+    if len(text_brief) > 120:
+        text_brief = text_brief[:120] + "..."
+    analysis_text = (
+        f"观点摘要：{text_brief or '模型未抽取到有效文本。'} "
+        f"L={logic_quality_l:.2f}，情绪分S_v={s_v:.4f}，评论修正={comment_adjust_factor:+.4f}，"
+        f"综合{sentiment_level}（{investment_advice}）。"
+    )
+
+    llm_cents = 12 + min(20, len(top_comments))
+    return {
+        "analysis_text": analysis_text,
+        "llm_cents": llm_cents,
+        "final_score": final_score,
+        "logic_quality_L": round(logic_quality_l, 4),
+        "S_v": round(s_v, 6),
+        "comment_adjust_factor": round(comment_adjust_factor, 6),
+        "sentiment_level": sentiment_level,
+        "investment_advice": investment_advice,
+    }
 
 
 def validate_comment(comment: Dict[str, Any]) -> None:
@@ -439,7 +558,7 @@ def process_comments(ark_service: ArkService, comments: List[Dict[str, Any]]) ->
     return total_support_score, total_oppose_score, valid_comment_count
 
 
-def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
+def cosine_similarity(vec1: Any, vec2: Any) -> float:
     """
     计算两个向量的余弦相似度。
 
@@ -455,7 +574,7 @@ def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
     return float(np.dot(vec1, vec2) / denom)
 
 
-def compute_consensus_c(embeddings: List[np.ndarray]) -> float:
+def compute_consensus_c(embeddings: List[Any]) -> float:
     """
     计算观点共识度 C：所有向量两两余弦相似度均值，保留2位小数。
 

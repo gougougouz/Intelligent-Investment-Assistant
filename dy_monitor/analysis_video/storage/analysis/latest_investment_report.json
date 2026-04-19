@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-04-16 17:52:50",
+  "scope_name": "近24小时已分析视频",
+  "video_count": 2,
+  "raw_video_count": 2,
+  "avg_heat": 0.4574,
+  "avg_sentiment": 0.0,
+  "sentiment_dispersion": 0.0,
+  "final_score": 48.9,
+  "sentiment_level": "中性",
+  "investment_advice": "持有/观望",
+  "advice_reason": "样本2条，平均热度0.46，平均情绪倾向+0.00，分歧度0.00。",
+  "risk_note": "建议结合基本面与量价数据进行二次确认。",
+  "key_videos": [
+    {
+      "aweme_id": "7628939837260729606",
+      "creator": "博主A",
+      "create_time": "1776258300",
+      "digg_count": 3416,
+      "comment_count": 95,
+      "collect_count": 426,
+      "heat_score": 0.5828,
+      "sentiment_score": 0.0,
+      "analysis_brief": "视频 7628939837260729606 互动概览：点赞 3416，评论 95，收藏 426，发布时间戳 1776258300。综合判断：热度上升，建议结合原视频进一步研判。"
+    },
+    {
+      "aweme_id": "7628970688837143862",
+      "creator": "博主A",
+      "create_time": "1776259722",
+      "digg_count": 1857,
+      "comment_count": 67,
+      "collect_count": 175,
+      "heat_score": 0.332,
+      "sentiment_score": 0.0,
+      "analysis_brief": "视频 7628970688837143862 互动概览：点赞 1857，评论 67，收藏 175，发布时间戳 1776259722。综合判断：热度上升，建议结合原视频进一步研判。"
+    }
+  ],
+  "newly_analyzed_count": 0,
+  "source_csv_count": 1
+}

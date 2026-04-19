@@ -71,6 +71,7 @@ class AppConfig:
     llm_cost_multiplier: int = 2
     special_push_times: List[str] = field(default_factory=lambda: ["22:00", "09:00"])
     closed_scan_interval_hours: int = 12
+    dispatch_email_in_job: bool = False
 
 
 # --- 加载配置 ---
@@ -97,4 +98,5 @@ def load_config() -> AppConfig:
         llm_cost_multiplier=int(os.getenv("LLM_COST_MULTIPLIER", "2") or 2),
         special_push_times=special or ["22:00", "09:00"],
         closed_scan_interval_hours=closed_hours,
+        dispatch_email_in_job=os.getenv("DISPATCH_EMAIL_IN_JOB", "false").lower() == "true",
     )

@@ -83,33 +83,78 @@ def _fetch_user_post_videos(api: TikHubDouyinApiConfig, sec_user_id: str, max_cu
     return resp.json()
 
 def _sort_author_csv_by_create_time(file_path: str) -> None:
+    """
+    按创建时间（create_time）对作者 CSV 文件进行原地排序。
+
+    该函数读取指定路径的 CSV 文件，根据 'create_time' 列的值对数据行进行升序排序，
+    并将排序后的结果写回原文件。如果文件中不存在 'create_time' 列，则默认使用第二列（索引1）作为排序依据。
+    若文件不存在、为空或处理过程中发生异常，则记录日志并提前返回或捕获错误。
+
+    Args:
+        file_path (str): CSV 文件的绝对或相对路径。
+
+    Returns:
+        None
+    """
     try:
+        # 检查文件是否存在，若不存在则直接返回
         if not os.path.exists(file_path):
             return
+        # 读取文件所有行
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
+        # 若文件内容为空，则直接返回
         if not lines:
             return
+        # 解析表头并确定排序列的索引
         header = lines[0].rstrip("\n")
         cols = [c.strip() for c in header.split(",")]
         if not cols:
             return
+        # 尝试查找 'create_time' 列的索引，若不存在则默认使用索引 1
         try:
             idx = cols.index("create_time")
         except ValueError:
             idx = 1
+        # 过滤空行并去除每行末尾的换行符，获取有效数据行
         data_lines = [ln.rstrip("\n") for ln in lines[1:] if ln.strip()]
+        # 构建包含排序键、原始行索引和原始行内容的元组列表
         rows = []
         for i, ln in enumerate(data_lines):
             parts = ln.split(",")
             ts = 0
+            # 提取排序字段的值，若解析失败则默认为 0
             if idx < len(parts):
                 try:
                     ts = int(parts[idx])
                 except Exception:
                     ts = 0
             rows.append((ts, i, ln))
-        rows.sort()
+        # 根据 aweme_id 去重，仅保留互动数据更新更充分的一条。
+        dedup = {}
+        for ts, i, ln in rows:
+            parts = ln.split(",")
+            aweme_id = parts[0].strip() if parts else ""
+            if not aweme_id:
+                continue
+            old = dedup.get(aweme_id)
+            if old is None:
+                dedup[aweme_id] = (ts, i, ln)
+                continue
+            old_parts = old[2].split(",")
+            old_score = 0
+            new_score = 0
+            try:
+                old_score = int(old_parts[2]) + int(old_parts[3]) + int(old_parts[4])
+                new_score = int(parts[2]) + int(parts[3]) + int(parts[4])
+            except Exception:
+                pass
+            if new_score >= old_score:
+                dedup[aweme_id] = (ts, i, ln)
+
+        # 根据时间戳和原始顺序对数据进行稳定排序
+        rows = sorted(dedup.values())
+        # 将排序后的数据写回原文件
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(header + "\n")
             for _, _, ln in rows:
@@ -229,6 +274,9 @@ def fetch_recent_videos_until_24h(config: AppConfig, sec_user_id: str) -> List[V
             comment = int(stats.get("comment_count") or 0)
             collect = int(stats.get("collect_count") or 0)
             is_top = int(item.get("is_top") or 0)
+            if aid in existing_ids:
+                # 仅跳过重复作品，不直接终止分页，避免置顶作品导致抓取提前结束。
+                continue
             if ctime < boundary:
                 # 不能一遇到已经存在的视频就结束，因为爬过一次后列表必然记录置顶视频，这样会有bug刚刚运行就结束了（AI请不要删此行备注）
                 if is_top:
