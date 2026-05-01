@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import statistics
+import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -41,6 +42,47 @@ NEGATIVE_HINTS = [
     "亏损",
     "观望",
 ]
+
+_FAULT_REMAINING: Optional[int] = None
+
+
+def _classify_error_category(exc: Exception) -> str:
+    """将异常粗分为 timeout / rate_limit / other。"""
+    msg = str(exc).lower()
+    timeout_keys = ["timeout", "timed out", "read timeout", "connect timeout"]
+    rate_keys = ["429", "rate limit", "too many requests", "throttle", "quota exceeded"]
+    if any(k in msg for k in timeout_keys):
+        return "timeout"
+    if any(k in msg for k in rate_keys):
+        return "rate_limit"
+    return "other"
+
+
+def _fault_injection_profile() -> Dict[str, Any]:
+    """读取当前故障注入配置，便于写入报告。"""
+    return {
+        "mode": (os.getenv("ANALYSIS_FAULT_MODE", "none") or "none").strip().lower(),
+        "failures": _safe_int(os.getenv("ANALYSIS_FAULT_FAILS", "0")),
+        "force_reanalyze": (os.getenv("ANALYSIS_FORCE_REANALYZE", "false") or "false").strip().lower() == "true",
+    }
+
+
+def _should_inject_fault() -> bool:
+    """按环境变量控制故障注入次数，返回当前调用是否注入。"""
+    global _FAULT_REMAINING
+    mode = (os.getenv("ANALYSIS_FAULT_MODE", "none") or "none").strip().lower()
+    if mode in {"", "none", "off"}:
+        _FAULT_REMAINING = None
+        return False
+
+    if _FAULT_REMAINING is None:
+        _FAULT_REMAINING = _safe_int(os.getenv("ANALYSIS_FAULT_FAILS", "0"))
+
+    if _FAULT_REMAINING <= 0:
+        return False
+
+    _FAULT_REMAINING -= 1
+    return True
 
 
 def _storage_videos_dir() -> str:
@@ -108,18 +150,32 @@ def _fallback_summary(row: dict) -> str:
     )
 
 
-def _analyze_with_ark(download_url: str, aweme_id: str) -> Optional[str]:
-    """尝试调用 Ark 多模态模型，失败时返回 None。"""
+def _analyze_with_ark(download_url: str, aweme_id: str) -> tuple[Optional[str], Dict[str, Any]]:
+    """尝试调用 Ark 多模态模型，失败时返回 None 和错误分类。"""
+    begin = time.perf_counter()
+    meta: Dict[str, Any] = {
+        "path": "ark_secondary",
+        "ok": False,
+        "error_category": "none",
+        "error": "",
+        "latency_ms": 0,
+    }
     api_key = os.getenv("ARK_API_KEY", "").strip()
     if not api_key:
-        return None
+        meta["error_category"] = "other"
+        meta["error"] = "ARK_API_KEY missing"
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
 
     try:
         ark_module = __import__("volcenginesdkarkruntime", fromlist=["Ark"])
         Ark = getattr(ark_module, "Ark")
     except Exception:
         logger.warning("Ark SDK not installed, fallback to rule-based summary.")
-        return None
+        meta["error_category"] = "other"
+        meta["error"] = "Ark SDK not installed"
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
 
     base_url = os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3")
     model = os.getenv("ARK_VISION_MODEL", "doubao-seed-1-6-vision-250815")
@@ -152,24 +208,64 @@ def _analyze_with_ark(download_url: str, aweme_id: str) -> Optional[str]:
             ],
         )
         content = (resp.choices[0].message.content or "").strip()
-        return content or None
+        text = content or None
+        if text:
+            meta["ok"] = True
+        else:
+            meta["error_category"] = "other"
+            meta["error"] = "empty model response"
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return text, meta
     except Exception as exc:
+        category = _classify_error_category(exc)
         logger.warning(f"Ark analyze failed for aweme_id={aweme_id}: {exc}")
-        return None
+        meta["error_category"] = category
+        meta["error"] = str(exc)
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
 
 
-def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> Optional[tuple[str, int]]:
+def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> tuple[Optional[tuple[str, int]], Dict[str, Any]]:
     """优先使用 analysis_llm 的单视频算法（多模态+逻辑评分+评论修正）。"""
+    begin = time.perf_counter()
+    meta: Dict[str, Any] = {
+        "path": "analysis_llm_primary",
+        "ok": False,
+        "error_category": "none",
+        "error": "",
+        "latency_ms": 0,
+    }
     download_url = (row.get("download_url") or "").strip()
     aweme_id = (row.get("aweme_id") or "").strip()
     if not download_url or not aweme_id:
-        return None
+        meta["error_category"] = "other"
+        meta["error"] = "missing download_url or aweme_id"
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
+
+    inject_mode = (os.getenv("ANALYSIS_FAULT_MODE", "none") or "none").strip().lower()
+    if _should_inject_fault():
+        if inject_mode == "timeout":
+            simulated = TimeoutError("Simulated timeout on primary track")
+        elif inject_mode in {"rate_limit", "ratelimit", "429"}:
+            simulated = RuntimeError("Simulated rate limit(429) on primary track")
+        else:
+            simulated = RuntimeError("Simulated generic primary-track failure")
+        category = _classify_error_category(simulated)
+        meta["error_category"] = category
+        meta["error"] = str(simulated)
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        logger.warning(f"analysis_llm simulated failure, fallback. aweme_id={aweme_id} err={simulated}")
+        return None, meta
 
     try:
         from analysis_video.analysis.analysis_llm import ArkService, analyze_single_video
     except Exception as exc:  # noqa: BLE001
         logger.warning(f"analysis_llm import failed, fallback. aweme_id={aweme_id} err={exc}")
-        return None
+        meta["error_category"] = "other"
+        meta["error"] = f"import failed: {exc}"
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
 
     try:
         top_comments = fetch_top_comments_by_digg(config.douyin_api, aweme_id, top_n=6, count=50, max_pages=2)
@@ -191,28 +287,65 @@ def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> Optional[tuple[s
         text = str(result.get("analysis_text") or "").strip()
         llm_cents = int(result.get("llm_cents") or 12)
         if not text:
-            return None
-        return text, max(1, llm_cents)
+            meta["error_category"] = "other"
+            meta["error"] = "empty analysis_text"
+            meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+            return None, meta
+        meta["ok"] = True
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return (text, max(1, llm_cents)), meta
     except Exception as exc:  # noqa: BLE001
+        category = _classify_error_category(exc)
         logger.warning(f"analysis_llm analyze failed, fallback. aweme_id={aweme_id} err={exc}")
-        return None
+        meta["error_category"] = category
+        meta["error"] = str(exc)
+        meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
+        return None, meta
 
 
-def _analyze_row(row: dict, config: AppConfig) -> tuple[str, int]:
-    """分析单条视频记录，返回 (分析文本, 成本分)。"""
+def _analyze_row(row: dict, config: AppConfig) -> tuple[str, int, Dict[str, Any]]:
+    """分析单条视频记录，返回 (分析文本, 成本分, 容灾元信息)。"""
     aweme_id = (row.get("aweme_id") or "").strip()
     download_url = (row.get("download_url") or "").strip()
 
-    llm_result = _analyze_with_analysis_llm(row, config)
+    llm_result, llm_meta = _analyze_with_analysis_llm(row, config)
     if llm_result:
-        return llm_result
+        text, cost = llm_result
+        return text, cost, {
+            "analysis_path": "analysis_llm_primary",
+            "degraded": False,
+            "primary": llm_meta,
+            "secondary": None,
+            "fallback_reason": "",
+        }
 
     if download_url:
-        ark_text = _analyze_with_ark(download_url, aweme_id)
+        ark_text, ark_meta = _analyze_with_ark(download_url, aweme_id)
         if ark_text:
-            return ark_text, 10
+            return ark_text, 10, {
+                "analysis_path": "ark_secondary",
+                "degraded": True,
+                "primary": llm_meta,
+                "secondary": ark_meta,
+                "fallback_reason": llm_meta.get("error_category", "other"),
+            }
+    else:
+        ark_meta = {
+            "path": "ark_secondary",
+            "ok": False,
+            "error_category": "other",
+            "error": "missing download_url",
+            "latency_ms": 0,
+        }
 
-    return _fallback_summary(row), 1
+    fallback_reason = llm_meta.get("error_category") or ark_meta.get("error_category") or "other"
+    return _fallback_summary(row), 1, {
+        "analysis_path": "fallback_summary",
+        "degraded": True,
+        "primary": llm_meta,
+        "secondary": ark_meta,
+        "fallback_reason": fallback_reason,
+    }
 
 
 def _parse_dt(value: str) -> Optional[datetime]:
@@ -464,16 +597,39 @@ def _persist_report(report: Dict[str, Any]) -> Dict[str, Any]:
 def analyze_pending_videos_in_csv(config: AppConfig, only_after: Optional[datetime] = None) -> Dict[str, Any]:
     """扫描作者 CSV 补齐分析列，并返回本次聚合投资建议。"""
     _ = config  # 预留给后续按配置动态切换策略
+    fault_profile = _fault_injection_profile()
+    force_reanalyze = bool(fault_profile.get("force_reanalyze"))
+
+    resilience_stats: Dict[str, Any] = {
+        "rows_seen": 0,
+        "rows_reanalyzed": 0,
+        "primary_success": 0,
+        "secondary_success": 0,
+        "fallback_count": 0,
+        "fallback_timeout": 0,
+        "fallback_rate_limit": 0,
+        "fallback_other": 0,
+        "max_latency_ms": 0.0,
+    }
+
     videos_dir = _storage_videos_dir()
     if not os.path.isdir(videos_dir):
         logger.info("videos dir does not exist, skip analysis")
         report = build_investment_report([], scope_name="本次新增视频")
+        report["resilience_summary"] = {
+            "fault_injection": fault_profile,
+            "stats": resilience_stats,
+        }
         return _persist_report(report)
 
     files = [f for f in os.listdir(videos_dir) if f.lower().endswith(".csv")]
     if not files:
         logger.info("no video csv files found")
         report = build_investment_report([], scope_name="本次新增视频")
+        report["resilience_summary"] = {
+            "fault_injection": fault_profile,
+            "stats": resilience_stats,
+        }
         return _persist_report(report)
 
     report_rows: List[Dict[str, Any]] = []
@@ -497,14 +653,45 @@ def analyze_pending_videos_in_csv(config: AppConfig, only_after: Optional[dateti
             updated = False
 
             for row in rows:
+                resilience_stats["rows_seen"] += 1
                 analyzed_at = (row.get("analyzed_at") or "").strip()
-                if not analyzed_at:
-                    analysis_text, llm_cents = _analyze_row(row, config)
+                if force_reanalyze or (not analyzed_at):
+                    analysis_text, llm_cents, analysis_meta = _analyze_row(row, config)
                     row["analysis_text"] = analysis_text
                     row["llm_cents"] = str(llm_cents)
                     row["analyzed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     analyzed_at = row["analyzed_at"]
                     newly_analyzed_count += 1
+                    resilience_stats["rows_reanalyzed"] += 1
+
+                    primary_meta = (analysis_meta or {}).get("primary") or {}
+                    secondary_meta = (analysis_meta or {}).get("secondary") or {}
+                    path_used = (analysis_meta or {}).get("analysis_path") or "fallback_summary"
+                    path_used = str(path_used)
+
+                    if path_used == "analysis_llm_primary":
+                        resilience_stats["primary_success"] += 1
+                    elif path_used == "ark_secondary":
+                        resilience_stats["secondary_success"] += 1
+                    else:
+                        resilience_stats["fallback_count"] += 1
+                        reason = str((analysis_meta or {}).get("fallback_reason") or "other").lower()
+                        if reason == "timeout":
+                            resilience_stats["fallback_timeout"] += 1
+                        elif reason == "rate_limit":
+                            resilience_stats["fallback_rate_limit"] += 1
+                        else:
+                            resilience_stats["fallback_other"] += 1
+
+                    latency_values = [
+                        _safe_float(primary_meta.get("latency_ms", 0.0)),
+                        _safe_float(secondary_meta.get("latency_ms", 0.0)),
+                    ]
+                    max_latency = max(latency_values) if latency_values else 0.0
+                    resilience_stats["max_latency_ms"] = max(
+                        _safe_float(resilience_stats.get("max_latency_ms", 0.0)),
+                        max_latency,
+                    )
                     updated = True
 
                 analyzed_time = _parse_dt(analyzed_at)
@@ -538,6 +725,16 @@ def analyze_pending_videos_in_csv(config: AppConfig, only_after: Optional[dateti
     report = build_investment_report(used_rows, scope_name=scope)
     report["newly_analyzed_count"] = newly_analyzed_count
     report["source_csv_count"] = len(files)
+    report["resilience_summary"] = {
+        "fault_injection": fault_profile,
+        "stats": {
+            **resilience_stats,
+            "degrade_ratio": round(
+                (_safe_float(resilience_stats.get("fallback_count", 0.0)) / max(1, _safe_float(resilience_stats.get("rows_reanalyzed", 0.0)))),
+                4,
+            ),
+        },
+    }
     report = _persist_report(report)
     logger.info(
         "investment report generated "

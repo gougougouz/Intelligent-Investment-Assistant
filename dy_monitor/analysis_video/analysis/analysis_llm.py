@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import os
+import random
 import time
 from itertools import combinations
 from typing import Any, Dict, List, Tuple
@@ -73,6 +75,15 @@ try:
 except ImportError:
     Ark = None  # type: ignore[assignment]
 
+try:
+    from .history_bounds import history_bounds_tuple
+except ImportError:
+    try:
+        from history_bounds import history_bounds_tuple  # type: ignore[no-redef]
+    except ImportError:
+        def history_bounds_tuple(auto_bootstrap: bool = True) -> tuple[float, float, str]:  # type: ignore[no-redef]
+            return HIST_MIN, HIST_MAX, "default_fallback"
+
 
 def to_float(value: Any, field_name: str) -> float:
     """
@@ -125,16 +136,57 @@ def call_with_retry(func, *args, **kwargs):
     输出：
     - 函数成功执行后的返回值
     """
+    fault_mode = (os.getenv("ANALYSIS_FAULT_MODE", "none") or "none").strip().lower()
+    fault_remain = int((os.getenv("ANALYSIS_FAULT_FAILS", "0") or "0").strip() or 0)
+    backoff_base = float((os.getenv("API_RETRY_INTERVAL_SEC", str(API_RETRY_INTERVAL_SEC)) or API_RETRY_INTERVAL_SEC))
+
+    def _classify_error(exc: Exception) -> str:
+        msg = str(exc).lower()
+        timeout_keys = ["timeout", "timed out", "read timeout", "connect timeout"]
+        rate_keys = ["429", "rate limit", "too many requests", "throttle", "quota exceeded"]
+        if any(k in msg for k in timeout_keys):
+            return "timeout"
+        if any(k in msg for k in rate_keys):
+            return "rate_limit"
+        return "other"
+
+    def _maybe_inject_fault(fail_idx: int) -> None:
+        nonlocal fault_remain
+        if fault_mode in {"", "none", "off"}:
+            return
+        if fault_remain <= 0:
+            return
+        fault_remain -= 1
+        if fault_mode == "timeout":
+            raise TimeoutError(f"Injected timeout at retry={fail_idx + 1}")
+        if fault_mode in {"rate_limit", "ratelimit", "429"}:
+            raise RuntimeError(f"Injected rate limit(429) at retry={fail_idx + 1}")
+        # mixed 模式在 timeout 与 rate_limit 之间随机切换。
+        if random.random() < 0.5:
+            raise TimeoutError(f"Injected timeout at retry={fail_idx + 1}")
+        raise RuntimeError(f"Injected rate limit(429) at retry={fail_idx + 1}")
+
     last_error = None
+    last_category = "other"
     for i in range(API_RETRY_TIMES):
         try:
+            _maybe_inject_fault(i)
             return func(*args, **kwargs)
         except Exception as exc:  # noqa: BLE001
             last_error = exc
-            print(f"[警告] API调用失败，第{i + 1}/{API_RETRY_TIMES}次重试：{exc}")
+            last_category = _classify_error(exc)
+            print(
+                f"[警告] API调用失败，第{i + 1}/{API_RETRY_TIMES}次重试，"
+                f"category={last_category} err={exc}"
+            )
             if i < API_RETRY_TIMES - 1:
-                time.sleep(API_RETRY_INTERVAL_SEC)
-    raise RuntimeError(f"API调用连续失败，已重试{API_RETRY_TIMES}次：{last_error}")
+                # 指数退避 + 轻微随机抖动，减少雪崩重试。
+                delay = backoff_base * (2 ** i) + random.uniform(0, min(0.3, backoff_base))
+                time.sleep(delay)
+
+    raise RuntimeError(
+        f"API调用连续失败，已重试{API_RETRY_TIMES}次，category={last_category}：{last_error}"
+    )
 
 
 class ArkService:
@@ -327,6 +379,15 @@ def analyze_single_video(
     if auth_type not in ALLOWED_AUTH_TYPES:
         auth_type = "普通用户"
 
+    # 默认使用 config.py 中的固定历史极值，便于人工先确定初值并长期复用。
+    bounds_mode = (os.getenv("HISTORY_BOUNDS_MODE", "static") or "static").strip().lower()
+    if bounds_mode in {"dynamic", "file", "bootstrap"}:
+        hist_min, hist_max, hist_source = history_bounds_tuple(auto_bootstrap=True)
+        if hist_max <= hist_min:
+            hist_min, hist_max, hist_source = HIST_MIN, HIST_MAX, "default_fallback"
+    else:
+        hist_min, hist_max, hist_source = HIST_MIN, HIST_MAX, "static_config"
+
     multi = ark_service.analyze_video_multimodal(base64_str)
     full_text = str(multi.get("full_text", "")).strip()
 
@@ -370,7 +431,7 @@ def analyze_single_video(
 
     # 单视频场景下将评论修正直接作用在该视频分值上。
     initial_score = s_v * (1 + comment_adjust_factor)
-    final_score = ((initial_score - HIST_MIN) / (HIST_MAX - HIST_MIN)) * 100
+    final_score = ((initial_score - hist_min) / (hist_max - hist_min)) * 100
     final_score = max(0.0, min(100.0, final_score))
     final_score = round(final_score, 1)
     sentiment_level, investment_advice = map_score_to_level_and_advice(final_score)
@@ -389,6 +450,10 @@ def analyze_single_video(
         "analysis_text": analysis_text,
         "llm_cents": llm_cents,
         "final_score": final_score,
+        "initial_score": round(initial_score, 6),
+        "hist_min_used": round(hist_min, 6),
+        "hist_max_used": round(hist_max, 6),
+        "history_bounds_source": hist_source,
         "logic_quality_L": round(logic_quality_l, 4),
         "S_v": round(s_v, 6),
         "comment_adjust_factor": round(comment_adjust_factor, 6),

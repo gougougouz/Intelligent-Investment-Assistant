@@ -14,14 +14,8 @@ python -m venv venv
 
 激活虚拟环境：
 
-- **Windows**:
-  ```bash
-  venv\Scripts\activate
-  ```
-- **macOS/Linux**:
-  ```bash
-  source venv/bin/activate
-  ```
+- **Windows**: `venv\Scripts\activate`
+- **macOS/Linux**: `source venv/bin/activate`
 
 然后，安装项目所需的依赖包：
 
@@ -31,21 +25,14 @@ pip install -r requirements.txt
 
 #### FFmpeg 安装
 
-- **macOS**: 使用 Homebrew 安装：
-  ```bash
-  brew install ffmpeg
-  ```
+- **macOS**: 使用 Homebrew 安装：`brew install ffmpeg`
 
 - **Windows**:
   1. 访问 [FFmpeg 官网下载页面](https://ffmpeg.org/download.html)。
   2. 下载适用于 Windows 的编译版本。
   3. 解压文件，并将 `bin` 目录的路径添加到系统的环境变量 `Path` 中。
 
-- **Linux**: 使用包管理器安装（以 Ubuntu/Debian 为例）：
-  ```bash
-  sudo apt update
-  sudo apt install ffmpeg
-  ```
+- **Linux**: 使用包管理器安装（以 Ubuntu/Debian 为例）：`sudo apt update && sudo apt install ffmpeg`
 
 ### 环境变量配置
 
@@ -63,6 +50,44 @@ ARK_API_KEY="your_ark_api_key"
 
 - `DOUYIN_AUTH_TOKEN`: 用于访问抖音 API 的授权令牌。
 - `ARK_API_KEY`: 用于访问方舟大模型服务的 API 密钥。
+
+### 容灾演练开关（可选）
+
+- `ANALYSIS_FAULT_MODE`: 分析层故障注入模式，可选 `none` / `timeout` / `rate_limit`。
+- `ANALYSIS_FAULT_FAILS`: 注入失败次数（整数）。
+- `ANALYSIS_FORCE_REANALYZE`: 设为 `true` 时会强制重跑已有分析结果，便于压测。
+
+示例：
+
+```env
+ANALYSIS_FAULT_MODE="timeout"
+ANALYSIS_FAULT_FAILS="20"
+ANALYSIS_FORCE_REANALYZE="true"
+```
+
+### 破坏性测试脚本
+
+可运行以下脚本执行 baseline/timeout/rate_limit 三组对照，并输出韧性报告：
+
+```bash
+python analysis_video/tests/resilience_drill.py
+```
+
+输出文件：
+
+- `analysis_video/storage/analysis/resilience_drill_report.json`
+
+### 一键运行入口（当前推荐）
+
+如果你现在只需要执行一次“近24小时抓取+分析+投资建议”，直接运行：
+
+```bash
+python analysis_video/run_24h_analysis.py
+```
+
+报告输出：
+
+- `analysis_video/storage/analysis/latest_investment_report.json`
 
 ## 存储文件格式
 
@@ -163,5 +188,5 @@ ARK_API_KEY="your_ark_api_key"
 - **`ts`**: 分析完成时的时间戳。
 - **`text`**: LLM 分析后的视频内容文本。
 - **`llm_cents`**: 本次分析的费用（以分为单位）。
-
+以上为主要存储结构说明。
 

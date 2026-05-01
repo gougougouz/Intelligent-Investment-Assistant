@@ -12,6 +12,8 @@ from analysis_video.accounts.billing_service import BillingService
 
 logger = get_logger("providers.douyin")
 
+DOUYIN_HTTP_TIMEOUT_SEC = float(os.getenv("DOUYIN_HTTP_TIMEOUT_SEC", "20") or 20)
+
 
 @dataclass
 class Video:
@@ -40,7 +42,12 @@ def get_sec_uid_from_share_link(share_url: str) -> Optional[str]:
 
     try:
         logger.info(f"正在从分享链接中提取 sec_uid: {share_url}")
-        response = requests.get(api_url, headers=headers, params=params)
+        response = requests.get(
+            api_url,
+            headers=headers,
+            params=params,
+            timeout=DOUYIN_HTTP_TIMEOUT_SEC,
+        )
         response.raise_for_status()
 
         data = response.json()
@@ -78,7 +85,7 @@ def _fetch_user_post_videos(api: TikHubDouyinApiConfig, sec_user_id: str, max_cu
     headers = {"Authorization": f"Bearer {api.auth_token}"}
     params = {"sec_user_id": sec_user_id, "max_cursor": max_cursor, "count": count, "sort_type": sort_type}
     url = f"{api.base_url}/api/v1/douyin/app/v3/fetch_user_post_videos"
-    resp = requests.get(url, headers=headers, params=params)
+    resp = requests.get(url, headers=headers, params=params, timeout=DOUYIN_HTTP_TIMEOUT_SEC)
     resp.raise_for_status()
     return resp.json()
 

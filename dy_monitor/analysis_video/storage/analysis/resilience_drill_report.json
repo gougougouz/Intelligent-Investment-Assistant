@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-04-19 22:58:16",
+  "scenarios": [
+    {
+      "name": "baseline",
+      "fault_mode": "none",
+      "fault_fails": 0,
+      "final_score": 50.0,
+      "investment_advice": "持有/观望",
+      "video_count": 0,
+      "rows_reanalyzed": 3,
+      "fallback_count": 3,
+      "fallback_timeout": 0,
+      "fallback_rate_limit": 0,
+      "degrade_ratio": 1.0
+    },
+    {
+      "name": "timeout_storm",
+      "fault_mode": "timeout",
+      "fault_fails": 9999,
+      "final_score": 50.0,
+      "investment_advice": "持有/观望",
+      "video_count": 0,
+      "rows_reanalyzed": 3,
+      "fallback_count": 3,
+      "fallback_timeout": 3,
+      "fallback_rate_limit": 0,
+      "degrade_ratio": 1.0
+    },
+    {
+      "name": "rate_limit_storm",
+      "fault_mode": "rate_limit",
+      "fault_fails": 9999,
+      "final_score": 50.0,
+      "investment_advice": "持有/观望",
+      "video_count": 0,
+      "rows_reanalyzed": 3,
+      "fallback_count": 3,
+      "fallback_timeout": 0,
+      "fallback_rate_limit": 3,
+      "degrade_ratio": 1.0
+    }
+  ]
+}

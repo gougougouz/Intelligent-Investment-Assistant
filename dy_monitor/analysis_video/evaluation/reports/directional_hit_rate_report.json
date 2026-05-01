@@ -1,0 +1,10 @@
+{
+  "labels_file": "e:\\AI\\Intelligent Investment Assistant_t2\\dy_monitor\\analysis_video\\evaluation\\data\\directional_labels_template.csv",
+  "sample_count": 0,
+  "correct_count": 0,
+  "skipped_count": 0,
+  "directional_hit_rate": 0.0,
+  "up_precision_proxy": 0.0,
+  "down_precision_proxy": 0.0,
+  "neutral_precision_proxy": 0.0
+}

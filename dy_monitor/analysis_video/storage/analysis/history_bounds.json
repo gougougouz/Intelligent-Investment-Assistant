@@ -1,0 +1,53 @@
+{
+  "hist_min": 0.0,
+  "hist_max": 0.1303,
+  "source": "seven_day_daily_extrema_bootstrap",
+  "lookback_days": 7,
+  "sample_count": 2,
+  "generated_at": "2026-04-22 02:33:24",
+  "method": "seven_day_daily_extrema",
+  "non_empty_day_count": 1,
+  "daily_initial_scores": [
+    {
+      "date": "2026-04-15",
+      "video_count": 2,
+      "initial_score": 0.1303
+    },
+    {
+      "date": "2026-04-16",
+      "video_count": 0,
+      "initial_score": 0.0
+    },
+    {
+      "date": "2026-04-17",
+      "video_count": 0,
+      "initial_score": 0.0
+    },
+    {
+      "date": "2026-04-18",
+      "video_count": 0,
+      "initial_score": 0.0
+    },
+    {
+      "date": "2026-04-19",
+      "video_count": 0,
+      "initial_score": 0.0
+    },
+    {
+      "date": "2026-04-20",
+      "video_count": 0,
+      "initial_score": 0.0
+    },
+    {
+      "date": "2026-04-21",
+      "video_count": 0,
+      "initial_score": 0.0
+    }
+  ],
+  "score_stats": {
+    "min": 0.0,
+    "max": 0.1303,
+    "mean": 0.0186,
+    "adjusted_for_degenerate_range": false
+  }
+}
