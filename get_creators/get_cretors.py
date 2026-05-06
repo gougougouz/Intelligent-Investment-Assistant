@@ -7,7 +7,9 @@ from typing import Dict, Optional
 
 import requests
 from dotenv import dotenv_values, load_dotenv
-
+"""
+从抖音分享文本中提取博主 sec_id 和昵称的工具脚本。
+"""
 
 # Auto-load .env so running this script directly can read tokens.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -104,13 +106,27 @@ def save_profile(profile: Dict[str, str], output_path: str, fmt: str) -> None:
 	os.makedirs(output_dir, exist_ok=True)
 
 	if fmt == "json":
+		existing = []
+		if os.path.exists(output_path):
+			try:
+				with open(output_path, "r", encoding="utf-8") as f:
+					loaded = json.load(f)
+				if isinstance(loaded, list):
+					existing = loaded
+				elif isinstance(loaded, dict):
+					existing = [loaded]
+			except Exception:
+				existing = []
+		existing.append(profile)
 		with open(output_path, "w", encoding="utf-8") as f:
-			json.dump(profile, f, ensure_ascii=False, indent=2)
+			json.dump(existing, f, ensure_ascii=False, indent=2)
 		return
 
-	with open(output_path, "w", encoding="utf-8", newline="") as f:
+	file_exists = os.path.exists(output_path)
+	with open(output_path, "a", encoding="utf-8", newline="") as f:
 		writer = csv.DictWriter(f, fieldnames=["nickname", "sec_id", "uid", "share_url"])
-		writer.writeheader()
+		if not file_exists:
+			writer.writeheader()
 		writer.writerow(profile)
 
 

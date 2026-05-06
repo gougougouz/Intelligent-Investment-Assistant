@@ -1,18 +1,53 @@
 {
-  "generated_at": "2026-04-28 00:38:44",
+  "generated_at": "2026-05-05 20:00:11",
   "scope_name": "本次新增视频",
-  "video_count": 0,
-  "avg_heat": 0.0,
-  "avg_sentiment": 0.0,
-  "sentiment_dispersion": 0.0,
-  "final_score": 50.0,
-  "sentiment_level": "中性",
-  "investment_advice": "持有/观望",
-  "advice_reason": "暂无可用视频样本，先维持中性判断。",
-  "risk_note": "样本不足，建议等待新增视频后再判断。",
-  "key_videos": [],
-  "newly_analyzed_count": 0,
-  "source_csv_count": 1,
+  "video_count": 24,
+  "raw_video_count": 24,
+  "avg_heat": 0.0552,
+  "avg_sentiment": -0.1725,
+  "sentiment_dispersion": 0.0969,
+  "final_score": 36.3,
+  "sentiment_level": "看空",
+  "investment_advice": "减仓/观望",
+  "advice_reason": "样本24条，平均热度0.06，平均情绪倾向-0.17，分歧度0.10。",
+  "risk_note": "样本热度较低，信号稳定性一般，建议继续观察。",
+  "key_videos": [
+    {
+      "aweme_id": "7636239735585000613",
+      "creator": "A股小王子",
+      "create_time": "1777950614",
+      "digg_count": 34,
+      "comment_count": 22,
+      "collect_count": 2,
+      "heat_score": 0.0179,
+      "sentiment_score": -0.36,
+      "analysis_brief": "观点摘要：抖音 抖音号: Shlidu Q A股小王子 A股 足球概念 世界杯 个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎。 世界杯 A股足球概念 股市的5月份 也要重点关注足球世界杯 体育这个方向 那么在节前最后一个交易"
+    },
+    {
+      "aweme_id": "7636064527251428986",
+      "creator": "A股小王子",
+      "create_time": "1777935600",
+      "digg_count": 33,
+      "comment_count": 13,
+      "collect_count": 4,
+      "heat_score": 0.0134,
+      "sentiment_score": -0.36,
+      "analysis_brief": "观点摘要：抖音、抖音号: Shlidu、Q A股小王子、A股机器人、个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎。a股的5月份有哪些板块可以期待、就是机器人、在节前最后一个交易日的时候、顶出9家涨停板、这叫板块出现了异动、那"
+    },
+    {
+      "aweme_id": "7636357021478717179",
+      "creator": "A股小王子",
+      "create_time": "1777977921",
+      "digg_count": 4,
+      "comment_count": 3,
+      "collect_count": 1,
+      "heat_score": 0.0027,
+      "sentiment_score": -0.36,
+      "analysis_brief": "观点摘要：抖音、抖音号:Shlidu、搜索“A股小王子”、国风背景画面文字：A股、房地产、天平、古钱币、罗盘、个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎；博主出镜字幕及语音：股市的5月份、还可以重点关注房地产板块、这一块呢"
+    }
+  ],
+  "newly_analyzed_count": 24,
+  "source_csv_count": 10,
   "resilience_summary": {
     "fault_injection": {
       "mode": "none",
@@ -20,16 +55,16 @@
       "force_reanalyze": false
     },
     "stats": {
-      "rows_seen": 3,
-      "rows_reanalyzed": 0,
-      "primary_success": 0,
+      "rows_seen": 27,
+      "rows_reanalyzed": 24,
+      "primary_success": 21,
       "secondary_success": 0,
-      "fallback_count": 0,
+      "fallback_count": 3,
       "fallback_timeout": 0,
       "fallback_rate_limit": 0,
-      "fallback_other": 0,
-      "max_latency_ms": 0.0,
-      "degrade_ratio": 0.0
+      "fallback_other": 3,
+      "max_latency_ms": 124231.822,
+      "degrade_ratio": 0.125
     }
   }
 }
