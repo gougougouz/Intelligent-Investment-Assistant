@@ -1,0 +1,9 @@
+2026-04-19 22:59:57,735 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-19 22:59:57,735 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-19 22:59:57,735 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776524397
+2026-04-19 23:00:01,991 - INFO - page summary added=0 reached_old=True
+2026-04-19 23:00:01,991 - INFO - terminate due to boundary
+2026-04-19 23:00:01,991 - INFO - author csv sorted by create_time
+2026-04-19 23:00:01,991 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-19 23:00:01,991 - INFO - creator done name=博主A count=0
+2026-04-19 23:00:01,991 - INFO - batch fetch creators done succeeded=1

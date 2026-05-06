@@ -1,0 +1,63 @@
+2026-04-16 16:43:07,789 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 16:43:07,795 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 16:43:07,795 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776242587
+2026-04-16 16:43:10,893 - INFO - page summary added=2 reached_old=True
+2026-04-16 16:43:10,893 - INFO - terminate due to boundary
+2026-04-16 16:43:10,901 - INFO - author csv sorted by create_time
+2026-04-16 16:43:10,901 - INFO - fetch_recent_videos_until_24h done total=2
+2026-04-16 16:43:10,902 - INFO - creator done name=博主A count=2
+2026-04-16 16:43:10,902 - INFO - batch fetch creators done succeeded=1
+2026-04-16 16:46:12,221 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 16:46:12,221 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 16:46:12,238 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776242772
+2026-04-16 16:46:15,579 - INFO - page summary added=2 reached_old=True
+2026-04-16 16:46:15,579 - INFO - terminate due to boundary
+2026-04-16 16:46:15,579 - INFO - author csv sorted by create_time
+2026-04-16 16:46:15,579 - INFO - fetch_recent_videos_until_24h done total=2
+2026-04-16 16:46:15,579 - INFO - creator done name=博主A count=2
+2026-04-16 16:46:15,579 - INFO - batch fetch creators done succeeded=1
+2026-04-16 16:50:31,582 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 16:50:31,582 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 16:50:31,595 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776243031
+2026-04-16 16:50:36,026 - INFO - page summary added=2 reached_old=True
+2026-04-16 16:50:36,026 - INFO - terminate due to boundary
+2026-04-16 16:50:36,038 - INFO - author csv sorted by create_time
+2026-04-16 16:50:36,038 - INFO - fetch_recent_videos_until_24h done total=2
+2026-04-16 16:50:36,038 - INFO - creator done name=博主A count=2
+2026-04-16 16:50:36,038 - INFO - batch fetch creators done succeeded=1
+2026-04-16 17:01:03,711 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 17:01:03,711 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 17:01:03,711 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776243663
+2026-04-16 17:01:08,224 - INFO - page summary added=0 reached_old=True
+2026-04-16 17:01:08,224 - INFO - terminate due to boundary
+2026-04-16 17:01:08,224 - INFO - author csv sorted by create_time
+2026-04-16 17:01:08,224 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-16 17:01:08,224 - INFO - creator done name=博主A count=0
+2026-04-16 17:01:08,224 - INFO - batch fetch creators done succeeded=1
+2026-04-16 17:05:24,819 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 17:05:24,819 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 17:05:24,819 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776243924
+2026-04-16 17:05:28,229 - INFO - page summary added=0 reached_old=True
+2026-04-16 17:05:28,229 - INFO - terminate due to boundary
+2026-04-16 17:05:28,229 - INFO - author csv sorted by create_time
+2026-04-16 17:05:28,229 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-16 17:05:28,229 - INFO - creator done name=博主A count=0
+2026-04-16 17:05:28,229 - INFO - batch fetch creators done succeeded=1
+2026-04-16 17:24:09,709 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 17:24:09,709 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 17:24:09,709 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776245049
+2026-04-16 17:24:13,450 - INFO - page summary added=0 reached_old=True
+2026-04-16 17:24:13,450 - INFO - terminate due to boundary
+2026-04-16 17:24:13,450 - INFO - author csv sorted by create_time
+2026-04-16 17:24:13,450 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-16 17:24:13,450 - INFO - creator done name=博主A count=0
+2026-04-16 17:24:13,450 - INFO - batch fetch creators done succeeded=1
+2026-04-16 17:52:45,606 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-16 17:52:45,607 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-16 17:52:45,607 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1776246765
+2026-04-16 17:52:50,167 - INFO - page summary added=0 reached_old=True
+2026-04-16 17:52:50,168 - INFO - terminate due to boundary
+2026-04-16 17:52:50,171 - INFO - author csv sorted by create_time
+2026-04-16 17:52:50,171 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-16 17:52:50,175 - INFO - creator done name=博主A count=0
+2026-04-16 17:52:50,190 - INFO - batch fetch creators done succeeded=1

@@ -16,4 +16,3 @@ analysis_video/video_downloads/
 analysis_video/config/storage/*.json
 
 # Logs
-analysis_video/logs/

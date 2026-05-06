@@ -1,0 +1,3 @@
+2026-05-05 19:46:50,004 - WARNING - fetch comments failed aweme_id=7635998204835708851 cursor=0 err=400 Client Error: Bad Request for url: https://api.tikhub.io/api/v1/douyin/web/fetch_video_comments?aweme_id=7635998204835708851&cursor=0&count=50
+2026-05-05 19:52:58,437 - WARNING - fetch comments failed aweme_id=7636036692294916325 cursor=0 err=400 Client Error: Bad Request for url: https://api.tikhub.io/api/v1/douyin/web/fetch_video_comments?aweme_id=7636036692294916325&cursor=0&count=50
+2026-05-05 19:56:22,921 - WARNING - fetch comments failed aweme_id=7636231687110765221 cursor=0 err=400 Client Error: Bad Request for url: https://api.tikhub.io/api/v1/douyin/web/fetch_video_comments?aweme_id=7636231687110765221&cursor=0&count=50

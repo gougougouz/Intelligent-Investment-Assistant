@@ -1,0 +1,78 @@
+2026-04-04 15:54:12,061 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 15:54:12,061 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 15:54:12,073 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775202852
+2026-04-04 15:54:13,053 - WARNING - request failed attempt=1: 401 Client Error: Unauthorized for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 15:54:14,797 - WARNING - request failed attempt=2: 401 Client Error: Unauthorized for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 15:54:17,835 - WARNING - request failed attempt=3: 401 Client Error: Unauthorized for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 15:54:17,839 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 15:54:17,841 - INFO - author csv sorted by create_time
+2026-04-04 15:54:17,841 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 15:54:17,842 - INFO - creator done name=博主A count=0
+2026-04-04 15:54:17,842 - INFO - batch fetch creators done succeeded=1
+2026-04-04 16:02:03,624 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 16:02:03,624 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 16:02:03,624 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775203323
+2026-04-04 16:02:04,376 - WARNING - request failed attempt=1: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:02:06,165 - WARNING - request failed attempt=2: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:02:09,000 - WARNING - request failed attempt=3: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:02:09,002 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 16:02:09,004 - INFO - author csv sorted by create_time
+2026-04-04 16:02:09,004 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 16:02:09,004 - INFO - creator done name=博主A count=0
+2026-04-04 16:02:09,004 - INFO - batch fetch creators done succeeded=1
+2026-04-04 16:45:47,459 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 16:45:47,459 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 16:45:47,460 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775205947
+2026-04-04 16:45:48,317 - WARNING - request failed attempt=1: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:45:49,985 - WARNING - request failed attempt=2: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:45:52,593 - WARNING - request failed attempt=3: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 16:45:52,595 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 16:45:52,597 - INFO - author csv sorted by create_time
+2026-04-04 16:45:52,598 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 16:45:52,599 - INFO - creator done name=博主A count=0
+2026-04-04 16:45:52,599 - INFO - batch fetch creators done succeeded=1
+2026-04-04 17:22:15,715 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 17:22:15,715 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 17:22:15,715 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775208135
+2026-04-04 17:22:16,598 - WARNING - request failed attempt=1: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 17:22:19,011 - WARNING - request failed attempt=2: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 17:22:21,642 - WARNING - request failed attempt=3: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 17:22:21,642 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 17:22:21,644 - INFO - author csv sorted by create_time
+2026-04-04 17:22:21,644 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 17:22:21,644 - INFO - creator done name=博主A count=0
+2026-04-04 17:22:21,644 - INFO - batch fetch creators done succeeded=1
+2026-04-04 18:48:38,296 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 18:48:38,296 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 18:48:38,296 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775213318
+2026-04-04 18:48:39,242 - WARNING - request failed attempt=1: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 18:48:40,852 - WARNING - request failed attempt=2: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 18:48:43,612 - WARNING - request failed attempt=3: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 18:48:43,615 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 18:48:43,616 - INFO - author csv sorted by create_time
+2026-04-04 18:48:43,618 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 18:48:43,619 - INFO - creator done name=博主A count=0
+2026-04-04 18:48:43,619 - INFO - batch fetch creators done succeeded=1
+2026-04-04 20:41:19,850 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 20:41:19,852 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 20:41:19,853 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775220079
+2026-04-04 20:41:20,684 - WARNING - request failed attempt=1: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 20:41:22,295 - WARNING - request failed attempt=2: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 20:41:24,890 - WARNING - request failed attempt=3: 402 Client Error: Payment Required for url: https://api.tikhub.io/api/v1/douyin/app/v3/fetch_user_post_videos?sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4&max_cursor=0&count=20&sort_type=0
+2026-04-04 20:41:24,892 - ERROR - request retries exhausted sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 20:41:24,892 - INFO - author csv sorted by create_time
+2026-04-04 20:41:24,892 - INFO - fetch_recent_videos_until_24h done total=0
+2026-04-04 20:41:24,892 - INFO - creator done name=博主A count=0
+2026-04-04 20:41:24,892 - INFO - batch fetch creators done succeeded=1
+2026-04-04 20:44:20,064 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 20:44:20,064 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 20:44:20,066 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775220260
+2026-04-04 23:25:55,220 - INFO - batch fetch creators start path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=1
+2026-04-04 23:25:55,220 - INFO - creator start name=博主A sec_uid=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4
+2026-04-04 23:25:55,221 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAGjKNHxjkCZkvHOlbQoak8AfOMAzx94au5szDYGhfcv4 boundary=1775229955
+2026-04-04 23:27:38,202 - INFO - page summary added=1 reached_old=True
+2026-04-04 23:27:38,202 - INFO - terminate due to boundary
+2026-04-04 23:27:38,215 - INFO - author csv sorted by create_time
+2026-04-04 23:27:38,215 - INFO - fetch_recent_videos_until_24h done total=1
+2026-04-04 23:27:38,216 - INFO - creator done name=博主A count=1
+2026-04-04 23:27:38,217 - INFO - batch fetch creators done succeeded=1

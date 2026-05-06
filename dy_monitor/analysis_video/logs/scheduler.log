@@ -1,0 +1,4 @@
+2026-04-19 22:59:57,735 - INFO - Job started.
+2026-04-19 23:00:02,003 - INFO - Investment report ready score=50.0 advice=持有/观望 path=E:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json
+2026-04-19 23:00:02,003 - INFO - Email dispatch disabled in job; skip notification and billing flow.
+2026-04-19 23:00:02,003 - INFO - Job finished.
