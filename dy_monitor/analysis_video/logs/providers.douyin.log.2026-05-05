@@ -1,0 +1,65 @@
+2026-05-05 19:31:41,107 - INFO - batch fetch creators start path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\config\storage\creators.json total=9
+2026-05-05 19:31:41,107 - INFO - creator start name=每日要闻梳理（每日早八点更新） sec_uid=MS4wLjABAAAA3NhJEE5-RjW_DE8JErZY5PL_Yt8o7uS4DxHgzGR-TdUwkg1NthRH1U7D2tRohGZ-
+2026-05-05 19:31:41,124 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAA3NhJEE5-RjW_DE8JErZY5PL_Yt8o7uS4DxHgzGR-TdUwkg1NthRH1U7D2tRohGZ- boundary=1777894301
+2026-05-05 19:31:43,777 - INFO - page summary added=1 reached_old=True
+2026-05-05 19:31:43,777 - INFO - terminate due to boundary
+2026-05-05 19:31:43,785 - INFO - author csv sorted by create_time
+2026-05-05 19:31:43,786 - INFO - fetch_recent_videos_until_24h done total=1
+2026-05-05 19:31:43,786 - INFO - creator done name=每日要闻梳理（每日早八点更新） count=1
+2026-05-05 19:31:43,787 - INFO - creator start name=财经干货铺 sec_uid=MS4wLjABAAAAV9wlCMg4etKto04ZY2LUYG9mnOjlRyvpt2c9lnrKRK2TKNqC_Ck9GbcwiFeHwriW
+2026-05-05 19:31:43,789 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAV9wlCMg4etKto04ZY2LUYG9mnOjlRyvpt2c9lnrKRK2TKNqC_Ck9GbcwiFeHwriW boundary=1777894303
+2026-05-05 19:31:45,934 - INFO - page summary added=7 reached_old=True
+2026-05-05 19:31:45,934 - INFO - terminate due to boundary
+2026-05-05 19:31:45,945 - INFO - author csv sorted by create_time
+2026-05-05 19:31:45,945 - INFO - fetch_recent_videos_until_24h done total=7
+2026-05-05 19:31:45,946 - INFO - creator done name=财经干货铺 count=7
+2026-05-05 19:31:45,946 - INFO - creator start name=大脚AI sec_uid=MS4wLjABAAAARGMZDHdHFVNne0V-7B2EfFjjtXkUCnbtnz4jGARpiRE
+2026-05-05 19:31:45,950 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAARGMZDHdHFVNne0V-7B2EfFjjtXkUCnbtnz4jGARpiRE boundary=1777894305
+2026-05-05 19:31:48,256 - INFO - page summary added=1 reached_old=True
+2026-05-05 19:31:48,256 - INFO - terminate due to boundary
+2026-05-05 19:31:48,263 - INFO - author csv sorted by create_time
+2026-05-05 19:31:48,263 - INFO - fetch_recent_videos_until_24h done total=1
+2026-05-05 19:31:48,264 - INFO - creator done name=大脚AI count=1
+2026-05-05 19:31:48,264 - INFO - creator start name=爆品研究社 sec_uid=MS4wLjABAAAAR7mbjbuS1uJJuakrWxmF4HHaem5ssIrArpcfAa9KkTo
+2026-05-05 19:31:48,266 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAR7mbjbuS1uJJuakrWxmF4HHaem5ssIrArpcfAa9KkTo boundary=1777894308
+2026-05-05 19:31:50,733 - INFO - page summary added=2 reached_old=True
+2026-05-05 19:31:50,734 - INFO - terminate due to boundary
+2026-05-05 19:31:50,742 - INFO - author csv sorted by create_time
+2026-05-05 19:31:50,742 - INFO - fetch_recent_videos_until_24h done total=2
+2026-05-05 19:31:50,743 - INFO - creator done name=爆品研究社 count=2
+2026-05-05 19:31:50,743 - INFO - creator start name=信息差cap sec_uid=MS4wLjABAAAADmuFM_P2w1Diz0qLXmKgYEhObssl3OHQONpaDXJGvds
+2026-05-05 19:31:50,745 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAADmuFM_P2w1Diz0qLXmKgYEhObssl3OHQONpaDXJGvds boundary=1777894310
+2026-05-05 19:31:53,806 - INFO - page summary added=1 reached_old=True
+2026-05-05 19:31:53,808 - INFO - terminate due to boundary
+2026-05-05 19:31:53,816 - INFO - author csv sorted by create_time
+2026-05-05 19:31:53,816 - INFO - fetch_recent_videos_until_24h done total=1
+2026-05-05 19:31:53,816 - INFO - creator done name=信息差cap count=1
+2026-05-05 19:31:53,816 - INFO - creator start name=A股小王子 sec_uid=MS4wLjABAAAACBVmhzSh2O97bp_27UQ-IjLU4swV0qzCaJbdN7uPiCE
+2026-05-05 19:31:53,819 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAACBVmhzSh2O97bp_27UQ-IjLU4swV0qzCaJbdN7uPiCE boundary=1777894313
+2026-05-05 19:31:57,373 - INFO - page summary added=3 reached_old=True
+2026-05-05 19:31:57,373 - INFO - terminate due to boundary
+2026-05-05 19:31:57,382 - INFO - author csv sorted by create_time
+2026-05-05 19:31:57,382 - INFO - fetch_recent_videos_until_24h done total=3
+2026-05-05 19:31:57,383 - INFO - creator done name=A股小王子 count=3
+2026-05-05 19:31:57,383 - INFO - creator start name=只做热点的道士 sec_uid=MS4wLjABAAAAfmkgbDP3cTho597WkU8Fg3e3c2qZazPbEKbRvJOfngM
+2026-05-05 19:31:57,385 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAfmkgbDP3cTho597WkU8Fg3e3c2qZazPbEKbRvJOfngM boundary=1777894317
+2026-05-05 19:32:02,359 - INFO - page summary added=3 reached_old=True
+2026-05-05 19:32:02,359 - INFO - terminate due to boundary
+2026-05-05 19:32:02,366 - INFO - author csv sorted by create_time
+2026-05-05 19:32:02,366 - INFO - fetch_recent_videos_until_24h done total=3
+2026-05-05 19:32:02,366 - INFO - creator done name=只做热点的道士 count=3
+2026-05-05 19:32:02,368 - INFO - creator start name=全球科技AI金融新闻 sec_uid=MS4wLjABAAAAyWUPvsBKZ9ohr6gaPuQFKkGly06rzk2PHB3RQ1gqvbaKhZ1A8Ponu1vYlcxkOlKz
+2026-05-05 19:32:02,370 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAyWUPvsBKZ9ohr6gaPuQFKkGly06rzk2PHB3RQ1gqvbaKhZ1A8Ponu1vYlcxkOlKz boundary=1777894322
+2026-05-05 19:32:05,712 - INFO - page summary added=5 reached_old=True
+2026-05-05 19:32:05,712 - INFO - terminate due to boundary
+2026-05-05 19:32:05,723 - INFO - author csv sorted by create_time
+2026-05-05 19:32:05,723 - INFO - fetch_recent_videos_until_24h done total=5
+2026-05-05 19:32:05,724 - INFO - creator done name=全球科技AI金融新闻 count=5
+2026-05-05 19:32:05,724 - INFO - creator start name=四木相对论 sec_uid=MS4wLjABAAAAM6Qaol9lNO2zgqlJJJU6bFB3PpfIGjbQPupfwlSJroNdPvPzW38p34xX9pdKRT8M
+2026-05-05 19:32:05,726 - INFO - fetch_recent_videos_until_24h start sec_user_id=MS4wLjABAAAAM6Qaol9lNO2zgqlJJJU6bFB3PpfIGjbQPupfwlSJroNdPvPzW38p34xX9pdKRT8M boundary=1777894325
+2026-05-05 19:32:09,614 - INFO - page summary added=1 reached_old=True
+2026-05-05 19:32:09,616 - INFO - terminate due to boundary
+2026-05-05 19:32:09,626 - INFO - author csv sorted by create_time
+2026-05-05 19:32:09,627 - INFO - fetch_recent_videos_until_24h done total=1
+2026-05-05 19:32:09,628 - INFO - creator done name=四木相对论 count=1
+2026-05-05 19:32:09,630 - INFO - batch fetch creators done succeeded=9

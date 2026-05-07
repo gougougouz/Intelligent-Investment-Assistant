@@ -1,53 +1,57 @@
 {
-  "generated_at": "2026-05-05 20:00:11",
+  "generated_at": "2026-05-06 20:13:51",
   "scope_name": "本次新增视频",
-  "video_count": 24,
-  "raw_video_count": 24,
-  "avg_heat": 0.0552,
-  "avg_sentiment": -0.1725,
-  "sentiment_dispersion": 0.0969,
-  "final_score": 36.3,
-  "sentiment_level": "看空",
-  "investment_advice": "减仓/观望",
-  "advice_reason": "样本24条，平均热度0.06，平均情绪倾向-0.17，分歧度0.10。",
+  "video_count": 17,
+  "raw_video_count": 17,
+  "avg_heat": 0.1982,
+  "avg_sentiment": -0.1694,
+  "sentiment_dispersion": 0.1305,
+  "final_score": 62.0,
+  "score_bias": 11.8,
+  "score_mode": "llm_fine",
+  "llm_score_count": 12,
+  "llm_score_coverage": 0.7059,
+  "sentiment_level": "看多",
+  "investment_advice": "加仓/持有",
+  "advice_reason": "样本17条，LLM精细评分覆盖12条（覆盖率71%），平均热度0.20，平均情绪倾向-0.17。",
   "risk_note": "样本热度较低，信号稳定性一般，建议继续观察。",
   "key_videos": [
     {
-      "aweme_id": "7636239735585000613",
-      "creator": "A股小王子",
-      "create_time": "1777950614",
-      "digg_count": 34,
-      "comment_count": 22,
-      "collect_count": 2,
-      "heat_score": 0.0179,
+      "aweme_id": "7636543629821466491",
+      "creator": "每日要闻梳理（每日早八点更新）",
+      "create_time": "1778021369",
+      "digg_count": 80,
+      "comment_count": 32,
+      "collect_count": 24,
+      "heat_score": 0.58,
       "sentiment_score": -0.36,
-      "analysis_brief": "观点摘要：抖音 抖音号: Shlidu Q A股小王子 A股 足球概念 世界杯 个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎。 世界杯 A股足球概念 股市的5月份 也要重点关注足球世界杯 体育这个方向 那么在节前最后一个交易"
+      "analysis_brief": "观点摘要：抖音号:26400948177 每日要闻梳理（每日早八点更新） 这里是2026年5月6日财经简读 1 浏阳烟花厂爆炸 国务院彻查全省停产 事故致二十六死六十一伤 国务院成立调查组 Accident 湖南全省烟花企业全面停产整顿 利"
     },
     {
-      "aweme_id": "7636064527251428986",
+      "aweme_id": "7636629918394440825",
       "creator": "A股小王子",
-      "create_time": "1777935600",
-      "digg_count": 33,
-      "comment_count": 13,
-      "collect_count": 4,
-      "heat_score": 0.0134,
-      "sentiment_score": -0.36,
-      "analysis_brief": "观点摘要：抖音、抖音号: Shlidu、Q A股小王子、A股机器人、个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎。a股的5月份有哪些板块可以期待、就是机器人、在节前最后一个交易日的时候、顶出9家涨停板、这叫板块出现了异动、那"
-    },
-    {
-      "aweme_id": "7636357021478717179",
-      "creator": "A股小王子",
-      "create_time": "1777977921",
-      "digg_count": 4,
-      "comment_count": 3,
+      "create_time": "1778041459",
+      "digg_count": 40,
+      "comment_count": 12,
       "collect_count": 1,
-      "heat_score": 0.0027,
+      "heat_score": 0.205,
       "sentiment_score": -0.36,
-      "analysis_brief": "观点摘要：抖音、抖音号:Shlidu、搜索“A股小王子”、国风背景画面文字：A股、房地产、天平、古钱币、罗盘、个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎；博主出镜字幕及语音：股市的5月份、还可以重点关注房地产板块、这一块呢"
+      "analysis_brief": "观点摘要：抖音 抖音号: Shlidu Q A股小王子 A股午间复盘 个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎。节后的A股呢非常强势 量价齐升 今天很有可能要挑战一下 三万亿的成交额 到中午收盘来看 三大指数呢全部创出了"
+    },
+    {
+      "aweme_id": "7636443063165945467",
+      "creator": "A股小王子",
+      "create_time": "1778022000",
+      "digg_count": 32,
+      "comment_count": 9,
+      "collect_count": 2,
+      "heat_score": 0.1655,
+      "sentiment_score": -0.36,
+      "analysis_brief": "观点摘要：抖音、抖音号: Shlidu、Q A股小王子、A股、商业航天、个人观点仅供参考，不构成任何投资建议，市场有风险，投资需谨慎、股市的五月份呢、还要重点关注商业航天方向、因为在节前最后一个交易日的时候、这个方向顶出了五家涨停板、并且都"
     }
   ],
-  "newly_analyzed_count": 24,
-  "source_csv_count": 10,
+  "newly_analyzed_count": 17,
+  "source_csv_count": 9,
   "resilience_summary": {
     "fault_injection": {
       "mode": "none",
@@ -55,16 +59,16 @@
       "force_reanalyze": false
     },
     "stats": {
-      "rows_seen": 27,
-      "rows_reanalyzed": 24,
-      "primary_success": 21,
+      "rows_seen": 17,
+      "rows_reanalyzed": 17,
+      "primary_success": 12,
       "secondary_success": 0,
-      "fallback_count": 3,
-      "fallback_timeout": 0,
+      "fallback_count": 5,
+      "fallback_timeout": 2,
       "fallback_rate_limit": 0,
       "fallback_other": 3,
-      "max_latency_ms": 124231.822,
-      "degrade_ratio": 0.125
+      "max_latency_ms": 198923.077,
+      "degrade_ratio": 0.2941
     }
   }
 }

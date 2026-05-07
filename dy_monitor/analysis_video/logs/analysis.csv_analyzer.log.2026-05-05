@@ -1,0 +1,13 @@
+2026-05-05 19:35:58,553 - INFO - updated analyzed rows in A股小王子.csv
+2026-05-05 19:36:20,441 - WARNING - analysis_llm analyze failed, fallback. aweme_id=7635603636067765540 err=未检测到 ffmpeg，请先安装后再进行音轨分离。
+2026-05-05 19:36:20,441 - INFO - updated analyzed rows in 信息差cap.csv
+2026-05-05 19:41:39,225 - INFO - updated analyzed rows in 全球科技AI金融新闻.csv
+2026-05-05 19:45:29,922 - WARNING - analysis_llm analyze failed, fallback. aweme_id=7636340154420006194 err=未检测到 ffmpeg，请先安装后再进行音轨分离。
+2026-05-05 19:45:29,924 - INFO - updated analyzed rows in 只做热点的道士.csv
+2026-05-05 19:46:47,391 - INFO - updated analyzed rows in 四木相对论.csv
+2026-05-05 19:47:29,224 - INFO - updated analyzed rows in 大脚AI.csv
+2026-05-05 19:48:39,982 - INFO - updated analyzed rows in 每日要闻梳理（每日早八点更新）.csv
+2026-05-05 19:51:32,828 - INFO - updated analyzed rows in 爆品研究社.csv
+2026-05-05 19:57:55,110 - WARNING - analysis_llm analyze failed, fallback. aweme_id=7636264098619061477 err=未检测到 ffmpeg，请先安装后再进行音轨分离。
+2026-05-05 20:00:11,375 - INFO - updated analyzed rows in 财经干货铺.csv
+2026-05-05 20:00:11,379 - INFO - investment report generated videos=24 score=36.3 advice=减仓/观望

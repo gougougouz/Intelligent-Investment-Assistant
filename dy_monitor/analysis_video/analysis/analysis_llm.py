@@ -26,6 +26,7 @@ try:
         API_RETRY_TIMES,
         ARK_API_KEY,
         ARK_BASE_URL,
+        COMMENT_ADJUST_CLAMP,
         COMMENT_LIKE_MAX,
         COMMENT_PROMPT,
         EMBEDDING_MODEL_ID,
@@ -33,6 +34,8 @@ try:
         HIST_MAX,
         HIST_MIN,
         LOGIC_PROMPT,
+        LOGIC_QUALITY_FLOOR,
+        LOGIC_QUALITY_FLOOR_CERTAINTY,
         LOGIC_QUALITY_THRESHOLD,
         MULTIMODAL_PROMPT,
         RAW_SENTIMENT_WEIGHT_AUDIO,
@@ -51,6 +54,7 @@ except ImportError:
         API_RETRY_TIMES,
         ARK_API_KEY,
         ARK_BASE_URL,
+        COMMENT_ADJUST_CLAMP,
         COMMENT_LIKE_MAX,
         COMMENT_PROMPT,
         EMBEDDING_MODEL_ID,
@@ -58,6 +62,8 @@ except ImportError:
         HIST_MAX,
         HIST_MIN,
         LOGIC_PROMPT,
+        LOGIC_QUALITY_FLOOR,
+        LOGIC_QUALITY_FLOOR_CERTAINTY,
         LOGIC_QUALITY_THRESHOLD,
         MULTIMODAL_PROMPT,
         RAW_SENTIMENT_WEIGHT_AUDIO,
@@ -100,6 +106,22 @@ def to_float(value: Any, field_name: str) -> float:
         return float(value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"字段 {field_name} 不是有效数值：{value}") from exc
+
+
+def clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def normalize_logic_quality(
+    logic_quality_l: float,
+    text_certainty: float,
+    full_text: str,
+) -> float:
+    if logic_quality_l <= 0.0:
+        if full_text.strip() and text_certainty >= LOGIC_QUALITY_FLOOR_CERTAINTY:
+            return LOGIC_QUALITY_FLOOR
+        return 0.0
+    return clamp(logic_quality_l, 0.0, 1.0)
 
 
 def safe_json_loads(text: str) -> Dict[str, Any]:
@@ -408,6 +430,7 @@ def analyze_single_video(
 
     logic_resp = ark_service.score_logic_quality(full_text)
     logic_quality_l = to_float(logic_resp.get("logic_quality_L", 0.0), "logic_quality_L")
+    logic_quality_l = normalize_logic_quality(logic_quality_l, text_certainty, full_text)
 
     support_score, oppose_score, valid_comment_count = process_comments(ark_service, top_comments)
     net_argument_sentiment = support_score - oppose_score
@@ -415,6 +438,7 @@ def analyze_single_video(
         comment_adjust_factor = 0.0
     else:
         comment_adjust_factor = net_argument_sentiment / valid_comment_count
+        comment_adjust_factor = clamp(comment_adjust_factor, -COMMENT_ADJUST_CLAMP, COMMENT_ADJUST_CLAMP)
 
     fan_norm = max(0.0, min(1.0, to_float(fan_count, "fan_count") / FAN_COUNT_MAX))
     like_norm = max(0.0, min(1.0, to_float(like_count, "like_count") / VIDEO_LIKE_MAX))
@@ -608,7 +632,11 @@ def process_comments(ark_service: ArkService, comments: List[Dict[str, Any]]) ->
                 continue
 
             # 单条评论点赞归一化：comment_like_norm = 评论点赞数 / 1000
-            comment_like_norm = to_float(comment["like_count"], "comment.like_count") / COMMENT_LIKE_MAX
+            comment_like_norm = clamp(
+                to_float(comment["like_count"], "comment.like_count") / COMMENT_LIKE_MAX,
+                0.0,
+                1.0,
+            )
             comment_score = argument_quality * comment_like_norm
 
             if direction == "support":
@@ -767,6 +795,7 @@ def run_pipeline(input_path: str, output_path: str) -> None:
             # 步骤3：逻辑质量评分 L
             logic_resp = ark_service.score_logic_quality(full_text)
             logic_quality_l = to_float(logic_resp.get("logic_quality_L", 0.0), "logic_quality_L")
+            logic_quality_l = normalize_logic_quality(logic_quality_l, text_certainty, full_text)
 
             # 步骤4：评论区论证质量评分汇总（全量参与后续修正）
             support_score, oppose_score, valid_comment_count = process_comments(
@@ -782,8 +811,8 @@ def run_pipeline(input_path: str, output_path: str) -> None:
                 f"反对分={oppose_score:.4f}, 有效评论={valid_comment_count}"
             )
 
-            # 步骤5-1：仅保留 logic_quality_L > 0.7
-            if logic_quality_l <= LOGIC_QUALITY_THRESHOLD:
+            # 步骤5-1：仅保留 logic_quality_L >= 阈值
+            if logic_quality_l < LOGIC_QUALITY_THRESHOLD:
                 print(
                     f"[过滤] video_id={video_id} 的 logic_quality_L={logic_quality_l:.2f} 未超过阈值 "
                     f"{LOGIC_QUALITY_THRESHOLD}，不纳入高逻辑视频集合"
@@ -791,8 +820,8 @@ def run_pipeline(input_path: str, output_path: str) -> None:
                 continue
 
             # 步骤5-2：基础传播影响力
-            fan_norm = to_float(video["fan_count"], "fan_count") / FAN_COUNT_MAX
-            like_norm = to_float(video["like_count"], "like_count") / VIDEO_LIKE_MAX
+            fan_norm = clamp(to_float(video["fan_count"], "fan_count") / FAN_COUNT_MAX, 0.0, 1.0)
+            like_norm = clamp(to_float(video["like_count"], "like_count") / VIDEO_LIKE_MAX, 0.0, 1.0)
             base_influence = fan_norm + like_norm
 
             # 步骤5-3：博主最终权重 W_b = base_influence × L × hist_acc
@@ -855,6 +884,7 @@ def run_pipeline(input_path: str, output_path: str) -> None:
         comment_adjust_factor = 0.0
     else:
         comment_adjust_factor = net_argument_sentiment / total_valid_comment_count_all
+        comment_adjust_factor = clamp(comment_adjust_factor, -COMMENT_ADJUST_CLAMP, COMMENT_ADJUST_CLAMP)
 
     # 步骤5-9：初始综合分
     initial_score = consensus_sentiment * (1 + comment_adjust_factor)

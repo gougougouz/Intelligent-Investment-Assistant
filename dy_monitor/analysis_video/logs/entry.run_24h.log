@@ -1,1 +1,4 @@
-2026-05-05 20:00:11,385 - INFO - Run finished score=36.3 advice=减仓/观望 path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json
+2026-05-06 16:18:44,171 - INFO - Run finished score=35.0 advice=减仓/观望 path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json
+2026-05-06 17:07:31,294 - INFO - Run finished score=37.3 advice=减仓/观望 path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json
+2026-05-06 17:49:11,307 - INFO - Run finished score=50.5 advice=持有/观望 path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json
+2026-05-06 20:13:51,651 - INFO - Run finished score=62.0 advice=加仓/持有 path=e:\AI\Intelligent Investment Assistant_t2\dy_monitor\analysis_video\storage\analysis\latest_investment_report.json

@@ -33,13 +33,16 @@ ALLOWED_AUTH_TYPES = {
 # 强制归一化最大值（必须严格使用）
 # =========================
 FAN_COUNT_MAX = 2_000_000
-VIDEO_LIKE_MAX = 3_000
-COMMENT_LIKE_MAX = 1_000
+VIDEO_LIKE_MAX = 200
+COMMENT_LIKE_MAX = 100
 
 # =========================
 # 评分阈值与权重
 # =========================
-LOGIC_QUALITY_THRESHOLD = 0.4
+LOGIC_QUALITY_THRESHOLD = 0.25
+LOGIC_QUALITY_FLOOR = 0.18
+LOGIC_QUALITY_FLOOR_CERTAINTY = 0.35
+COMMENT_ADJUST_CLAMP = 0.6
 
 RAW_SENTIMENT_WEIGHT_TEXT = 0.6
 RAW_SENTIMENT_WEIGHT_AUDIO = 0.25
@@ -52,8 +55,8 @@ LOGIC_SCORE_WEIGHT_C = 0.25
 # =========================
 # 百分制映射历史极值
 # =========================
-HIST_MIN = -3.0
-HIST_MAX = 4.0
+HIST_MIN = -2.8
+HIST_MAX = 2.8
 
 # =========================
 # 重试策略

@@ -1,1 +1,6 @@
-2026-05-05 20:00:11,380 - INFO - One-off pipeline completed score=36.3 advice=减仓/观望 videos=24
+2026-05-06 16:18:44,170 - INFO - One-off pipeline completed score=35.0 advice=减仓/观望 videos=16
+2026-05-06 17:07:31,293 - INFO - One-off pipeline completed score=37.3 advice=减仓/观望 videos=40
+2026-05-06 17:29:23,029 - INFO - reset: cleared creator csv files and downloaded videos csv_removed=9
+2026-05-06 17:49:11,306 - INFO - One-off pipeline completed score=50.5 advice=持有/观望 videos=19
+2026-05-06 19:53:11,873 - INFO - reset: cleared creator csv files and downloaded videos csv_removed=9
+2026-05-06 20:13:51,650 - INFO - One-off pipeline completed score=62.0 advice=加仓/持有 videos=17

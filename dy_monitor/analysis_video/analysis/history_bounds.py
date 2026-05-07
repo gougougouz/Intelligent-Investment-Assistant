@@ -7,8 +7,10 @@ import statistics
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-DEFAULT_HIST_MIN = -3.0
-DEFAULT_HIST_MAX = 4.0
+DEFAULT_HIST_MIN = -2.8
+DEFAULT_HIST_MAX = 2.8
+MIN_HIST_RANGE = 2.0
+ZERO_MARGIN = 0.2
 HISTORY_BOUNDS_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "storage", "analysis", "history_bounds.json")
 )
@@ -70,6 +72,38 @@ def _clamp(value: float, low: float, high: float) -> float:
     if value > high:
         return high
     return value
+
+
+def _normalize_history_bounds(hist_min: float, hist_max: float) -> tuple[float, float, bool]:
+    adjusted = False
+    if hist_max <= hist_min:
+        return DEFAULT_HIST_MIN, DEFAULT_HIST_MAX, True
+
+    if hist_min > -ZERO_MARGIN:
+        hist_min = -ZERO_MARGIN
+        adjusted = True
+    if hist_max < ZERO_MARGIN:
+        hist_max = ZERO_MARGIN
+        adjusted = True
+
+    span = hist_max - hist_min
+    if span < MIN_HIST_RANGE:
+        pad = (MIN_HIST_RANGE - span) / 2
+        hist_min -= pad
+        hist_max += pad
+        adjusted = True
+
+    if hist_min < DEFAULT_HIST_MIN:
+        hist_min = DEFAULT_HIST_MIN
+        adjusted = True
+    if hist_max > DEFAULT_HIST_MAX:
+        hist_max = DEFAULT_HIST_MAX
+        adjusted = True
+
+    if hist_max <= hist_min:
+        return DEFAULT_HIST_MIN, DEFAULT_HIST_MAX, True
+
+    return round(hist_min, 4), round(hist_max, 4), adjusted
 
 
 def _parse_dt(value: Any) -> Optional[datetime]:
@@ -158,9 +192,9 @@ def _estimate_text_sentiment(text: str) -> float:
 
 
 def _interaction_heat(row: Dict[str, Any]) -> float:
-    digg_norm = _clamp(_safe_int(row.get("digg_count")) / 5000.0, 0.0, 1.0)
-    comment_norm = _clamp(_safe_int(row.get("comment_count")) / 500.0, 0.0, 1.0)
-    collect_norm = _clamp(_safe_int(row.get("collect_count")) / 300.0, 0.0, 1.0)
+    digg_norm = _clamp(_safe_int(row.get("digg_count")) / 200.0, 0.0, 1.0)
+    comment_norm = _clamp(_safe_int(row.get("comment_count")) / 40.0, 0.0, 1.0)
+    collect_norm = _clamp(_safe_int(row.get("collect_count")) / 30.0, 0.0, 1.0)
     return round(digg_norm * 0.55 + comment_norm * 0.30 + collect_norm * 0.15, 4)
 
 
@@ -216,6 +250,9 @@ def _build_payload_from_daily_scores(
         hist_min = round(hist_min - 0.5, 4)
         hist_max = round(hist_max + 0.5, 4)
 
+    hist_min, hist_max, normalized = _normalize_history_bounds(hist_min, hist_max)
+    adjusted = adjusted or normalized
+
     non_empty_days = sum(1 for item in daily_scores if int(item.get("video_count", 0)) > 0)
     return {
         "hist_min": hist_min,
@@ -232,6 +269,7 @@ def _build_payload_from_daily_scores(
             "max": hist_max,
             "mean": round(statistics.mean(values), 4),
             "adjusted_for_degenerate_range": adjusted,
+            "normalized_for_reasonable_range": normalized,
         },
     }
 
@@ -274,12 +312,13 @@ def load_history_bounds(auto_bootstrap: bool = True) -> Dict[str, Any]:
                 payload = json.load(f)
             hist_min = _safe_float(payload.get("hist_min", DEFAULT_HIST_MIN))
             hist_max = _safe_float(payload.get("hist_max", DEFAULT_HIST_MAX))
-            if hist_max <= hist_min:
-                raise ValueError("invalid history bounds")
+            hist_min, hist_max, normalized = _normalize_history_bounds(hist_min, hist_max)
             payload["hist_min"] = hist_min
             payload["hist_max"] = hist_max
             payload.setdefault("source", "history_file")
             payload.setdefault("method", "loaded_from_file")
+            payload.setdefault("score_stats", {})
+            payload["score_stats"]["normalized_for_reasonable_range"] = normalized
             _CACHED_BOUNDS = payload
             return dict(payload)
         except Exception:
@@ -298,6 +337,7 @@ def history_bounds_tuple(auto_bootstrap: bool = True) -> tuple[float, float, str
     hist_min = _safe_float(payload.get("hist_min", DEFAULT_HIST_MIN))
     hist_max = _safe_float(payload.get("hist_max", DEFAULT_HIST_MAX))
     source = str(payload.get("source", "default"))
+    hist_min, hist_max, _ = _normalize_history_bounds(hist_min, hist_max)
     if hist_max <= hist_min:
         return DEFAULT_HIST_MIN, DEFAULT_HIST_MAX, "default_fallback"
     return hist_min, hist_max, source

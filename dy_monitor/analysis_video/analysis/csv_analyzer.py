@@ -13,6 +13,10 @@ from analysis_video.utils.video_base64 import video_to_base64
 
 logger = get_logger("analysis.csv_analyzer")
 
+LLM_COVERAGE_THRESHOLD = 0.2
+LLM_MIN_COUNT = 1
+FINAL_SCORE_BIAS = 11.8
+
 POSITIVE_HINTS = [
     "看多",
     "上涨",
@@ -97,7 +101,19 @@ def _storage_analysis_dir() -> str:
 
 def _ensure_analysis_columns(header: List[str]) -> List[str]:
     """确保 CSV 头包含分析结果字段，并维持调度器所需列顺序。"""
-    required = ["analysis_text", "llm_cents", "analyzed_at"]
+    required = [
+        "analysis_text",
+        "llm_cents",
+        "analyzed_at",
+        "analysis_path",
+        "llm_final_score",
+        "llm_initial_score",
+        "logic_quality_L",
+        "comment_adjust_factor",
+        "hist_min_used",
+        "hist_max_used",
+        "history_bounds_source",
+    ]
     out = list(header)
     for col in required:
         if col not in out:
@@ -119,6 +135,10 @@ def _safe_float(value: Any) -> float:
         return float(str(value or "0").strip())
     except Exception:
         return 0.0
+
+
+def _has_value(value: Any) -> bool:
+    return str(value or "").strip() != ""
 
 
 def _clamp(value: float, low: float, high: float) -> float:
@@ -225,7 +245,7 @@ def _analyze_with_ark(download_url: str, aweme_id: str) -> tuple[Optional[str], 
         return None, meta
 
 
-def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> tuple[Optional[tuple[str, int]], Dict[str, Any]]:
+def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
     """优先使用 analysis_llm 的单视频算法（多模态+逻辑评分+评论修正）。"""
     begin = time.perf_counter()
     meta: Dict[str, Any] = {
@@ -293,7 +313,18 @@ def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> tuple[Optional[t
             return None, meta
         meta["ok"] = True
         meta["latency_ms"] = round((time.perf_counter() - begin) * 1000.0, 3)
-        return (text, max(1, llm_cents)), meta
+        payload = {
+            "analysis_text": text,
+            "llm_cents": max(1, llm_cents),
+            "llm_final_score": result.get("final_score", ""),
+            "llm_initial_score": result.get("initial_score", ""),
+            "logic_quality_L": result.get("logic_quality_L", ""),
+            "comment_adjust_factor": result.get("comment_adjust_factor", ""),
+            "hist_min_used": result.get("hist_min_used", ""),
+            "hist_max_used": result.get("hist_max_used", ""),
+            "history_bounds_source": result.get("history_bounds_source", ""),
+        }
+        return payload, meta
     except Exception as exc:  # noqa: BLE001
         category = _classify_error_category(exc)
         logger.warning(f"analysis_llm analyze failed, fallback. aweme_id={aweme_id} err={exc}")
@@ -303,15 +334,14 @@ def _analyze_with_analysis_llm(row: dict, config: AppConfig) -> tuple[Optional[t
         return None, meta
 
 
-def _analyze_row(row: dict, config: AppConfig) -> tuple[str, int, Dict[str, Any]]:
-    """分析单条视频记录，返回 (分析文本, 成本分, 容灾元信息)。"""
+def _analyze_row(row: dict, config: AppConfig) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    """分析单条视频记录，返回 (分析结果, 容灾元信息)。"""
     aweme_id = (row.get("aweme_id") or "").strip()
     download_url = (row.get("download_url") or "").strip()
 
     llm_result, llm_meta = _analyze_with_analysis_llm(row, config)
     if llm_result:
-        text, cost = llm_result
-        return text, cost, {
+        return llm_result, {
             "analysis_path": "analysis_llm_primary",
             "degraded": False,
             "primary": llm_meta,
@@ -322,7 +352,7 @@ def _analyze_row(row: dict, config: AppConfig) -> tuple[str, int, Dict[str, Any]
     if download_url:
         ark_text, ark_meta = _analyze_with_ark(download_url, aweme_id)
         if ark_text:
-            return ark_text, 10, {
+            return {"analysis_text": ark_text, "llm_cents": 10}, {
                 "analysis_path": "ark_secondary",
                 "degraded": True,
                 "primary": llm_meta,
@@ -339,7 +369,7 @@ def _analyze_row(row: dict, config: AppConfig) -> tuple[str, int, Dict[str, Any]
         }
 
     fallback_reason = llm_meta.get("error_category") or ark_meta.get("error_category") or "other"
-    return _fallback_summary(row), 1, {
+    return {"analysis_text": _fallback_summary(row), "llm_cents": 1}, {
         "analysis_path": "fallback_summary",
         "degraded": True,
         "primary": llm_meta,
@@ -361,9 +391,9 @@ def _parse_dt(value: str) -> Optional[datetime]:
 
 def _interaction_heat(row: Dict[str, Any]) -> float:
     """基于点赞/评论/收藏计算互动热度（0~1）。"""
-    digg_norm = _clamp(_safe_int(row.get("digg_count")) / 5000.0, 0.0, 1.0)
-    comment_norm = _clamp(_safe_int(row.get("comment_count")) / 500.0, 0.0, 1.0)
-    collect_norm = _clamp(_safe_int(row.get("collect_count")) / 300.0, 0.0, 1.0)
+    digg_norm = _clamp(_safe_int(row.get("digg_count")) / 200.0, 0.0, 1.0)
+    comment_norm = _clamp(_safe_int(row.get("comment_count")) / 40.0, 0.0, 1.0)
+    collect_norm = _clamp(_safe_int(row.get("collect_count")) / 30.0, 0.0, 1.0)
     return round(digg_norm * 0.55 + comment_norm * 0.30 + collect_norm * 0.15, 4)
 
 
@@ -457,6 +487,9 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
             "avg_sentiment": 0.0,
             "sentiment_dispersion": 0.0,
             "final_score": 50.0,
+            "score_mode": "none",
+            "llm_score_count": 0,
+            "llm_score_coverage": 0.0,
             "sentiment_level": sentiment_level,
             "investment_advice": investment_advice,
             "advice_reason": "暂无可用视频样本，先维持中性判断。",
@@ -470,6 +503,8 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
         sentiment_score = _estimate_sentiment_from_text(str(row.get("analysis_text") or ""))
         influence = 0.4 + 0.6 * heat_score
         weighted_sentiment = sentiment_score * influence
+        llm_score_raw = row.get("llm_final_score")
+        llm_final_score = _safe_float(llm_score_raw) if _has_value(llm_score_raw) else None
         scored_rows.append(
             {
                 "aweme_id": (row.get("aweme_id") or "").strip(),
@@ -482,6 +517,7 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
                 "heat_score": round(heat_score, 4),
                 "sentiment_score": round(sentiment_score, 4),
                 "weighted_sentiment": round(weighted_sentiment, 4),
+                "llm_final_score": llm_final_score,
             }
         )
 
@@ -496,8 +532,25 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
     )
     weighted_sentiment = float(sum(weighted_values) / len(weighted_values))
 
-    final_score = 50.0 + weighted_sentiment * 35.0 + (avg_heat - 0.5) * 25.0
-    final_score = round(_clamp(final_score, 0.0, 100.0), 1)
+    llm_scores = [
+        (item["llm_final_score"], 0.7 + 0.3 * item["heat_score"])
+        for item in scored_rows
+        if item.get("llm_final_score") is not None
+    ]
+    llm_score_count = len(llm_scores)
+    llm_coverage = round(llm_score_count / len(scored_rows), 4)
+    use_llm = llm_score_count >= max(LLM_MIN_COUNT, int(len(scored_rows) * LLM_COVERAGE_THRESHOLD))
+
+    if use_llm:
+        weight_sum = float(sum(weight for _, weight in llm_scores)) or 1.0
+        llm_weighted_avg = float(sum(score * weight for score, weight in llm_scores)) / weight_sum
+        final_score = round(_clamp(llm_weighted_avg + FINAL_SCORE_BIAS, 0.0, 100.0), 1)
+        score_mode = "llm_fine"
+    else:
+        final_score = 50.0 + weighted_sentiment * 35.0 + (avg_heat - 0.5) * 25.0
+        final_score = round(_clamp(final_score + FINAL_SCORE_BIAS, 0.0, 100.0), 1)
+        score_mode = "csv_heuristic"
+
     sentiment_level, investment_advice = _map_score_to_level_and_advice(final_score)
     risk_note = _build_risk_note(avg_sentiment, sentiment_dispersion, avg_heat)
 
@@ -523,10 +576,16 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
             }
         )
 
-    advice_reason = (
-        f"样本{len(scored_rows)}条，平均热度{avg_heat:.2f}，"
-        f"平均情绪倾向{avg_sentiment:+.2f}，分歧度{sentiment_dispersion:.2f}。"
-    )
+    if score_mode == "llm_fine":
+        advice_reason = (
+            f"样本{len(scored_rows)}条，LLM精细评分覆盖{llm_score_count}条（覆盖率{llm_coverage:.0%}），"
+            f"平均热度{avg_heat:.2f}，平均情绪倾向{avg_sentiment:+.2f}。"
+        )
+    else:
+        advice_reason = (
+            f"样本{len(scored_rows)}条，平均热度{avg_heat:.2f}，"
+            f"平均情绪倾向{avg_sentiment:+.2f}，分歧度{sentiment_dispersion:.2f}。"
+        )
 
     return {
         "generated_at": generated_at,
@@ -537,6 +596,10 @@ def build_investment_report(video_rows: List[Dict[str, Any]], scope_name: str = 
         "avg_sentiment": round(avg_sentiment, 4),
         "sentiment_dispersion": round(sentiment_dispersion, 4),
         "final_score": final_score,
+        "score_bias": FINAL_SCORE_BIAS,
+        "score_mode": score_mode,
+        "llm_score_count": llm_score_count,
+        "llm_score_coverage": llm_coverage,
         "sentiment_level": sentiment_level,
         "investment_advice": investment_advice,
         "advice_reason": advice_reason,
@@ -579,6 +642,7 @@ def _extract_report_row(row: Dict[str, Any], creator_name: str) -> Dict[str, Any
         "comment_count": row.get("comment_count") or "0",
         "collect_count": row.get("collect_count") or "0",
         "analysis_text": row.get("analysis_text") or "",
+        "llm_final_score": row.get("llm_final_score") or "",
         "creator": creator_name,
     }
 
@@ -655,10 +719,23 @@ def analyze_pending_videos_in_csv(config: AppConfig, only_after: Optional[dateti
             for row in rows:
                 resilience_stats["rows_seen"] += 1
                 analyzed_at = (row.get("analyzed_at") or "").strip()
-                if force_reanalyze or (not analyzed_at):
-                    analysis_text, llm_cents, analysis_meta = _analyze_row(row, config)
-                    row["analysis_text"] = analysis_text
-                    row["llm_cents"] = str(llm_cents)
+                analysis_path = str(row.get("analysis_path") or "").strip()
+                needs_llm_score = not _has_value(row.get("llm_final_score"))
+                should_reanalyze = force_reanalyze or (not analyzed_at) or (
+                    needs_llm_score and analysis_path in {"", "analysis_llm_primary"}
+                )
+                if should_reanalyze:
+                    analysis_result, analysis_meta = _analyze_row(row, config)
+                    row["analysis_text"] = str(analysis_result.get("analysis_text") or "")
+                    row["llm_cents"] = str(analysis_result.get("llm_cents") or 1)
+                    row["analysis_path"] = str(analysis_meta.get("analysis_path") or "fallback_summary")
+                    row["llm_final_score"] = str(analysis_result.get("llm_final_score") or "")
+                    row["llm_initial_score"] = str(analysis_result.get("llm_initial_score") or "")
+                    row["logic_quality_L"] = str(analysis_result.get("logic_quality_L") or "")
+                    row["comment_adjust_factor"] = str(analysis_result.get("comment_adjust_factor") or "")
+                    row["hist_min_used"] = str(analysis_result.get("hist_min_used") or "")
+                    row["hist_max_used"] = str(analysis_result.get("hist_max_used") or "")
+                    row["history_bounds_source"] = str(analysis_result.get("history_bounds_source") or "")
                     row["analyzed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     analyzed_at = row["analyzed_at"]
                     newly_analyzed_count += 1
